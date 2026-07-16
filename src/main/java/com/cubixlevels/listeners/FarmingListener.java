@@ -1,6 +1,7 @@
 package com.cubixlevels.listeners;
 
 import com.cubixlevels.CubixLevels;
+import com.cubixlevels.MessagesManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
@@ -28,10 +29,8 @@ public class FarmingListener implements Listener {
         Block block = event.getBlock();
         Material type = block.getType();
 
-        // Check crops
         double xp = getXpForCrop(type);
         if (xp > 0) {
-            // Only fully grown crops give XP
             if (block.getBlockData() instanceof Ageable ageable) {
                 if (ageable.getAge() < ageable.getMaximumAge()) return;
             }
@@ -39,11 +38,12 @@ public class FarmingListener implements Listener {
             return;
         }
 
-        // Check pumpkins and melons (no ageable data)
         if (type == Material.PUMPKIN) {
-            grantXp(player, plugin.getConfig().getDouble("farming.crops.PUMPKIN", 1.0), "Тыква");
+            grantXp(player, plugin.getConfig().getDouble("farming.crops.PUMPKIN", 1.0),
+                    MessagesManager.getString("names.pumpkin", "Pumpkin"));
         } else if (type == Material.MELON) {
-            grantXp(player, plugin.getConfig().getDouble("farming.crops.MELON", 1.0), "Арбуз");
+            grantXp(player, plugin.getConfig().getDouble("farming.crops.MELON", 1.0),
+                    MessagesManager.getString("names.melon", "Melon"));
         }
     }
 
@@ -55,11 +55,11 @@ public class FarmingListener implements Listener {
 
         Material type = event.getClickedBlock().getType();
         if (type == Material.SWEET_BERRY_BUSH) {
-            // Check if bush has berries
             if (event.getClickedBlock().getBlockData() instanceof Ageable ageable) {
-                if (ageable.getAge() >= 2) { // age 2=with berries, 3=full
-                    Player player = event.getPlayer();
-                    grantXp(player, plugin.getConfig().getDouble("farming.crops.SWEET_BERRY_BUSH", 0.5), "Ягоды");
+                if (ageable.getAge() >= 2) {
+                    grantXp(event.getPlayer(),
+                            plugin.getConfig().getDouble("farming.crops.SWEET_BERRY_BUSH", 0.5),
+                            MessagesManager.getString("names.berry", "Berries"));
                 }
             }
         }
@@ -73,22 +73,25 @@ public class FarmingListener implements Listener {
         for (var item : event.getItems()) {
             Material dropType = item.getItemStack().getType();
             if (dropType == Material.HONEY_BOTTLE)
-                grantXp(event.getPlayer(), plugin.getConfig().getDouble("farming.honey.HONEY_BOTTLE", 5.0), "Мёд");
+                grantXp(event.getPlayer(),
+                        plugin.getConfig().getDouble("farming.honey.HONEY_BOTTLE", 5.0),
+                        MessagesManager.getString("names.honey_bottle", "Honey"));
             else if (dropType == Material.HONEYCOMB)
-                grantXp(event.getPlayer(), plugin.getConfig().getDouble("farming.honey.HONEYCOMB", 2.0), "Соты");
+                grantXp(event.getPlayer(),
+                        plugin.getConfig().getDouble("farming.honey.HONEYCOMB", 2.0),
+                        MessagesManager.getString("names.honeycomb", "Honeycomb"));
         }
     }
 
     private double getXpForCrop(Material mat) {
-        String key = mat.name();
-        return plugin.getConfig().getDouble("farming.crops." + key, 0);
+        return plugin.getConfig().getDouble("farming.crops." + mat.name(), 0);
     }
 
     private String getCropName(Material mat) {
         return switch (mat) {
-            case WHEAT -> "Пшеница";
-            case CARROTS -> "Морковь";
-            case POTATOES -> "Картошка";
+            case WHEAT -> MessagesManager.getString("names.wheats", "Wheat");
+            case CARROTS -> MessagesManager.getString("names.carrots", "Carrots");
+            case POTATOES -> MessagesManager.getString("names.potatoes", "Potatoes");
             default -> {
                 String name = mat.name().toLowerCase().replace('_', ' ');
                 yield Character.toUpperCase(name.charAt(0)) + name.substring(1);
@@ -99,7 +102,9 @@ public class FarmingListener implements Listener {
     private void grantXp(Player player, double xp, String name) {
         if (xp <= 0) return;
         plugin.getPlayerDataManager().addXp(player.getUniqueId(), xp, player);
-        player.sendMessage("§7🌾 §a+" + formatXp(xp) + " XP §7(" + name + ")");
+        player.sendMessage(MessagesManager.replace(
+                MessagesManager.getString("xp.farming", "§7🌾 §a+{amount} XP §7({action})"),
+                "amount", formatXp(xp), "action", name));
     }
 
     private String formatXp(double xp) {

@@ -1,7 +1,7 @@
 package com.cubixlevels.listeners;
 
 import com.cubixlevels.CubixLevels;
-import org.bukkit.entity.Fish;
+import com.cubixlevels.MessagesManager;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,18 +24,16 @@ public class FishingListener implements Listener {
 
         Player player = event.getPlayer();
 
-        // Check if it's really a fish (not treasure or junk)
         if (event.getCaught() instanceof Item item) {
-            var itemStack = item.getItemStack();
-            var type = itemStack.getType();
+            var type = item.getItemStack().getType();
 
-            // Only actual fish items
             if (type.name().contains("COD") || type.name().contains("SALMON")
                     || type.name().contains("PUFFERFISH") || type.name().contains("TROPICAL_FISH")) {
 
                 double xp = plugin.getConfig().getDouble("fishing.xp-per-catch", 5.0);
                 plugin.getPlayerDataManager().addXp(player.getUniqueId(), xp, player);
-                player.sendMessage("§7🎣 §a+" + formatXp(xp) + " XP §7(Рыбалка)");
+                player.sendMessage(MessagesManager.format("xp.fishing", "§7🎣 §a+{amount} XP §7(Fishing)",
+                        "amount", formatXp(xp)));
             }
         }
     }

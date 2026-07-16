@@ -1,6 +1,7 @@
 package com.cubixlevels.listeners;
 
 import com.cubixlevels.CubixLevels;
+import com.cubixlevels.MessagesManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,7 +27,6 @@ public class DistanceListener implements Listener {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
 
-        // Don't count if just looking around
         if (event.getFrom().getBlockX() == event.getTo().getBlockX()
                 && event.getFrom().getBlockZ() == event.getTo().getBlockZ()) {
             return;
@@ -38,15 +38,12 @@ public class DistanceListener implements Listener {
             return;
         }
 
-        // Calculate distance moved (2D, ignore Y)
         double dx = event.getTo().getX() - last.getX();
         double dz = event.getTo().getZ() - last.getZ();
         double distance = Math.sqrt(dx * dx + dz * dz);
 
-        // Only count if player moved more than 1 block (avoid tiny movements)
         if (distance < 1.0) return;
 
-        // Track cumulative distance
         double cumulative = cumulativeDistance.getOrDefault(uuid, 0.0);
         cumulative += distance;
         cumulativeDistance.put(uuid, cumulative);
@@ -58,7 +55,8 @@ public class DistanceListener implements Listener {
             cumulative -= interval;
             cumulativeDistance.put(uuid, cumulative);
             plugin.getPlayerDataManager().addXp(uuid, xpAmount, player);
-            player.sendMessage("§7🚶 §a+" + xpAmount + " XP §7(Пройдено " + interval + " блоков)");
+            player.sendMessage(MessagesManager.format("xp.distance", "§7🚶 §a+{amount} XP §7(§7{blocks} blocks)",
+                    "amount", String.valueOf(xpAmount), "blocks", String.valueOf(interval)));
         }
 
         lastPosition.put(uuid, event.getTo().clone());

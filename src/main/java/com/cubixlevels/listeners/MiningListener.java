@@ -1,6 +1,7 @@
 package com.cubixlevels.listeners;
 
 import com.cubixlevels.CubixLevels;
+import com.cubixlevels.MessagesManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -8,9 +9,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class MiningListener implements Listener {
 
@@ -28,32 +26,18 @@ public class MiningListener implements Listener {
         Block block = event.getBlock();
         Material type = block.getType();
 
-        // Check config for XP value
         double xp = getXpForBlock(type);
         if (xp <= 0) return;
 
-        // Only natural ores
         if (!plugin.getNaturalCheck().isNaturalOre(block)) return;
 
         plugin.getPlayerDataManager().addXp(player.getUniqueId(), xp, player);
-        player.sendMessage("§7⛏ §a+" + formatXp(xp) + " XP §7(" + getBlockName(type) + ")");
+        player.sendMessage(MessagesManager.format("xp.mining", "§7⛏ §a+{amount} XP §7(Mining)",
+                "amount", formatXp(xp)));
     }
 
     private double getXpForBlock(Material mat) {
-        String key = mat.name();
-        return plugin.getConfig().getDouble("mining.blocks." + key, 0);
-    }
-
-    private String getBlockName(Material mat) {
-        String name = mat.name().toLowerCase().replace('_', ' ');
-        // Remove "deepslate_" prefix for cleaner display
-        name = name.replace("deepslate ", "");
-        name = name.replace("nether ", "");
-        // Capitalize first letter
-        if (!name.isEmpty()) {
-            name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
-        }
-        return name;
+        return plugin.getConfig().getDouble("mining.blocks." + mat.name(), 0);
     }
 
     private String formatXp(double xp) {

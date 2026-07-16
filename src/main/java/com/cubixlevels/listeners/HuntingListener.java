@@ -1,6 +1,7 @@
 package com.cubixlevels.listeners;
 
 import com.cubixlevels.CubixLevels;
+import com.cubixlevels.MessagesManager;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,25 +21,23 @@ public class HuntingListener implements Listener {
     public void onEntityDeath(EntityDeathEvent event) {
         if (!plugin.getConfig().getBoolean("hunting.enabled", true)) return;
 
-        // Check if killed by a player
         Player player = event.getEntity().getKiller();
         if (player == null) return;
 
-        // Check if mob is natural (not from spawner, not from egg)
         if (!plugin.getNaturalCheck().isNaturalMob(event.getEntity())) return;
 
-        // Get XP from config
         EntityType type = event.getEntityType();
         double xp = plugin.getConfig().getDouble("hunting.mobs." + type.name(), 0);
         if (xp <= 0) return;
 
         plugin.getPlayerDataManager().addXp(player.getUniqueId(), xp, player);
-        player.sendMessage("§7⚔ §a+" + formatXp(xp) + " XP §7(" + getMobName(type) + ")");
+        player.sendMessage(MessagesManager.replace(
+                MessagesManager.getString("xp.hunting", "§7⚔ §a+{amount} XP §7({action})"),
+                "amount", formatXp(xp), "action", getMobName(type)));
     }
 
     private String getMobName(EntityType type) {
         String name = type.name().toLowerCase().replace('_', ' ');
-        // Capitalize
         String[] parts = name.split(" ");
         StringBuilder sb = new StringBuilder();
         for (String part : parts) {

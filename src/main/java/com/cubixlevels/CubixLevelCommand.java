@@ -6,6 +6,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public class CubixLevelCommand implements CommandExecutor {
 
     private final CubixLevels plugin;
@@ -20,7 +22,7 @@ public class CubixLevelCommand implements CommandExecutor {
 
         if (args.length == 0) {
             if (!(sender instanceof Player player)) {
-                sender.sendMessage("§cТолько игрок может использовать эту команду.");
+                sender.sendMessage(MessagesManager.getString("general.player_only", "§c❌ Only players can use this command!"));
                 return true;
             }
             showStats(player);
@@ -30,46 +32,49 @@ public class CubixLevelCommand implements CommandExecutor {
         switch (args[0].toLowerCase()) {
             case "reload" -> {
                 if (!sender.hasPermission("cubixlevels.reload")) {
-                    sender.sendMessage("§cУ вас нет прав.");
+                    sender.sendMessage(MessagesManager.getString("general.no_permission", "§c❌ You don't have permission!"));
                     return true;
                 }
                 plugin.reloadConfig();
+                MessagesManager.reload();
                 plugin.getLevelManager().reload();
                 // Resync all online players' cached values
                 for (org.bukkit.entity.Player p : plugin.getServer().getOnlinePlayers()) {
                     plugin.getPlayerDataManager().syncToManagers(p.getUniqueId());
                 }
-                sender.sendMessage("§aКонфигурация CubixLevels перезагружена!");
+                sender.sendMessage(MessagesManager.getString("general.config_reloaded", "§a✔ Configuration reloaded!"));
             }
             case "daily" -> {
                 if (!(sender instanceof Player player)) {
-                    sender.sendMessage("§cТолько игрок может использовать эту команду.");
+                    sender.sendMessage(MessagesManager.getString("general.player_only", "§c❌ Only players can use this command!"));
                     return true;
                 }
                 if (plugin.getPlayerDataManager().canClaimDailyBonus(player.getUniqueId())) {
                     plugin.getPlayerDataManager().claimDailyBonus(player.getUniqueId(), player);
                 } else {
-                    player.sendMessage("§cВы уже получили ежедневный бонус сегодня!");
+                    player.sendMessage(MessagesManager.getString("general.already_daily", "§c❌ You already claimed daily bonus today!"));
                 }
             }
             case "stats" -> {
                 if (!(sender instanceof Player player)) {
-                    sender.sendMessage("§cТолько игрок может использовать эту команду.");
+                    sender.sendMessage(MessagesManager.getString("general.player_only", "§c❌ Only players can use this command!"));
                     return true;
                 }
                 showStats(player);
             }
             default -> {
                 if (sender.hasPermission("cubixlevels.admin")) {
-                    sender.sendMessage("§6CubixLevels команды:");
-                    sender.sendMessage("§e/cubixlevel §7— показать статистику");
-                    sender.sendMessage("§e/cubixlevel daily §7— ежедневный бонус");
-                    sender.sendMessage("§e/cubixlevel reload §7— перезагрузить конфиг");
-                    sender.sendMessage("§e/cubixlevel stats §7— показать статистику");
+                    for (String line : MessagesManager.getStringList("command.help_admin",
+                            List.of("§e/cubixlevel §7— stats", "§e/cubixlevel stats §7— stats", "§e/cubixlevel daily §7— daily bonus", "§e/cubixlevel reload §7— reload config"))) {
+                        sender.sendMessage(line);
+                    }
                 } else {
-                    sender.sendMessage("§6CubixLevels §7v" + plugin.getDescription().getVersion());
-                    sender.sendMessage("§e/cubixlevel §7— показать статистику");
-                    sender.sendMessage("§e/cubixlevel daily §7— ежедневный бонус");
+                    String version = plugin.getDescription().getVersion();
+                    sender.sendMessage(MessagesManager.format("command.help_header", "§6CubixLevels §7v{version}", "version", version));
+                    for (String line : MessagesManager.getStringList("command.help_player",
+                            List.of("§e/cubixlevel §7— stats", "§e/cubixlevel daily §7— daily bonus"))) {
+                        sender.sendMessage(line);
+                    }
                 }
             }
         }
@@ -83,27 +88,33 @@ public class CubixLevelCommand implements CommandExecutor {
         double needed = plugin.getLevelManager().getXpForNextLevel(level);
         int maxLevel = plugin.getLevelManager().getMaxLevel();
 
-        player.sendMessage("§6╔══════════════════════════════╗");
-        player.sendMessage("§6║ §lCubixLevels §r§6— Твой прогресс ║");
-        player.sendMessage("§6╚══════════════════════════════╝");
-        player.sendMessage("§e✦ Уровень: §f" + level + " §7/ " + maxLevel);
+        player.sendMessage(MessagesManager.getString("stats.header", "§6╔══════════════════════════════╗"));
+        player.sendMessage(MessagesManager.getString("stats.title", "§6║ §lCubixLevels §r§6— Your progress ║"));
+        player.sendMessage(MessagesManager.getString("stats.footer", "§6╚══════════════════════════════╝"));
+
+        player.sendMessage(MessagesManager.format("stats.level", "§e✦ Level: §f{level} §7/ {max}",
+                "level", String.valueOf(level), "max", String.valueOf(maxLevel)));
 
         if (level < maxLevel) {
-            int progress = needed > 0 ? (int) ((xp / needed) * 100) : 0;
-            player.sendMessage("§e✦ Опыт: §f" + formatXp(xp) + " §7/ " + formatXp(needed) + " XP");
-            player.sendMessage("§e✦ Прогресс: §f" + Math.min(progress, 100) + "%");
-            player.sendMessage(progressBar(progress));
+            int progressPercent = needed > 0 ? (int) ((xp / needed) * 100) : 0;
+            player.sendMessage(MessagesManager.format("stats.xp", "§e✦ XP: §f{xp} §7/ {needed} XP",
+                    "xp", formatXp(xp), "needed", formatXp(needed)));
+            player.sendMessage(MessagesManager.format("stats.progress", "§e✦ Progress: §f{percent}%",
+                    "percent", String.valueOf(Math.min(progressPercent, 100))));
+            player.sendMessage(progressBar(progressPercent));
         } else {
-            player.sendMessage("§e✦ Опыт: §f" + formatXp(xp) + " XP");
-            player.sendMessage("§6✦ §lМАКСИМАЛЬНЫЙ УРОВЕНЬ! §6✦");
+            player.sendMessage(MessagesManager.getString("stats.max_level", "§6✦ §lMAX LEVEL! §6✦"));
         }
     }
 
     private String progressBar(int percent) {
         int bars = Math.min(percent / 10, 10);
-        StringBuilder sb = new StringBuilder("§7[");
-        for (int i = 0; i < bars; i++) sb.append("§a■");
-        for (int i = bars; i < 10; i++) sb.append("§7■");
+        String filled = MessagesManager.getString("stats.progress_bar_filled", "§a■");
+        String empty = MessagesManager.getString("stats.progress_bar_empty", "§7■");
+        String bracket = MessagesManager.getString("stats.progress_bar_bracket", "§7[");
+        StringBuilder sb = new StringBuilder(bracket);
+        for (int i = 0; i < bars; i++) sb.append(filled);
+        for (int i = bars; i < 10; i++) sb.append(empty);
         sb.append("§7]");
         return sb.toString();
     }

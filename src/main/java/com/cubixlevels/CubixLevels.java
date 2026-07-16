@@ -11,8 +11,7 @@ public final class CubixLevels extends JavaPlugin {
     private LevelManager levelManager;
     private PlayerDataManager playerDataManager;
     private NaturalCheck naturalCheck;
-    private CubixPlaceholderExpansion placeholderExpansion;
-    private boolean hasPlaceholderAPI;
+    private CubixPlaceholderExpansion placeholderExpansion;    private boolean hasPlaceholderAPI;
 
     @Override
     public void onEnable() {
@@ -20,6 +19,10 @@ public final class CubixLevels extends JavaPlugin {
 
         // Save default config
         saveDefaultConfig();
+
+        // Init messages & guide
+        MessagesManager.init(this);
+        ConfigGuideManager.init(this);
 
         // Load managers
         this.naturalCheck = new NaturalCheck();
@@ -50,7 +53,7 @@ public final class CubixLevels extends JavaPlugin {
                 hasPlaceholderAPI = false;
             }
         } else {
-            getLogger().info("PlaceholderAPI not found — placeholders disabled");
+            getLogger().info(MessagesManager.getString("errors.papi_not_found", "§ePlaceholderAPI not found — placeholders disabled"));
         }
 
         // Load all player data

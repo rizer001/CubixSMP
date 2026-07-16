@@ -1,86 +1,143 @@
-# ─────────────────────────────────────────────
-# CubixLevels Configuration
-# ─────────────────────────────────────────────
+# ╔════════════════════════════════════════════════════════════════════╗
+# ║                    CubixLevels Configuration                      ║
+# ║                       Version 1.0.0                               ║
+# ╚════════════════════════════════════════════════════════════════════╝
+# 
+# Основные настройки плагина CubixLevels.
+# Подробное описание всех опций — в plugin-guide.txt
+#
+# При изменении этого файла используйте /cubixlevel reload
+# или перезагрузите сервер.
 
-# XP settings
+# ─────────────────────────────────────────────
+# 📊 SYSTEM — Основные настройки системы уровней
+# ─────────────────────────────────────────────
 settings:
-  # XP needed per level: base + (level * multiplier)
+  # Формула XP на уровень: base + (level * multiplier)
+  # Пример: уровень 0→1 = 100 XP, уровень 1→2 = 100 + 1*1.5 = 101.5 XP
   xp-base: 100
   xp-multiplier: 1.5
   max-level: 100
 
-  # Distance tracking (blocks)
-  distance-interval: 1000
-  xp-per-distance-interval: 5
+  # 🚶 Настройки XP за дистанцию
+  distance-interval: 1000     # блоков на один тик XP
+  xp-per-distance-interval: 5 # XP за каждый интервал
 
-  # Playtime tracking (seconds)
-  playtime-interval: 1800  # 30 minutes
+  # ⏱ Настройки XP за отыгранное время
+  playtime-interval: 1800     # секунд на один тик XP (1800 = 30 мин)
   xp-per-playtime-interval: 10
 
-  # Daily bonus
-  daily-bonus-xp: 50
+  # ☀ Ежедневный бонус
+  daily-bonus-xp: 50          # XP за /cubixlevel daily
 
-# ─── Mining ───────────────────────────────────
+# ═════════════════════════════════════════════════════════════════════
+# ⛏ 1. MINING — Опыт за добычу руд
+# ═════════════════════════════════════════════════════════════════════
+# Опыт начисляется только за натурально заспавненные руды.
+# Проверка: блок окружён натуральным камнем (stone, deepslate, netherrack и т.д.)
 mining:
   enabled: true
   blocks:
-    COAL_ORE: 1
-    DEEPSLATE_COAL_ORE: 1
-    COPPER_ORE: 2
-    DEEPSLATE_COPPER_ORE: 2
-    IRON_ORE: 3
-    DEEPSLATE_IRON_ORE: 3
-    NETHER_QUARTZ_ORE: 3
-    GOLD_ORE: 4
-    DEEPSLATE_GOLD_ORE: 4
-    LAPIS_ORE: 4
-    DEEPSLATE_LAPIS_ORE: 4
-    REDSTONE_ORE: 4
-    DEEPSLATE_REDSTONE_ORE: 4
-    DIAMOND_ORE: 5
-    DEEPSLATE_DIAMOND_ORE: 5
-    ANCIENT_DEBRIS: 10
+    # Уголь
+    COAL_ORE: 1.0
+    DEEPSLATE_COAL_ORE: 1.0
+    # Медь
+    COPPER_ORE: 2.0
+    DEEPSLATE_COPPER_ORE: 2.0
+    # Железо
+    IRON_ORE: 3.0
+    DEEPSLATE_IRON_ORE: 3.0
+    # Кварц (Nether)
+    NETHER_QUARTZ_ORE: 3.0
+    # Золото
+    GOLD_ORE: 4.0
+    DEEPSLATE_GOLD_ORE: 4.0
+    # Лазурит
+    LAPIS_ORE: 4.0
+    DEEPSLATE_LAPIS_ORE: 4.0
+    # Редстоун
+    REDSTONE_ORE: 4.0
+    DEEPSLATE_REDSTONE_ORE: 4.0
+    # Алмазы
+    DIAMOND_ORE: 5.0
+    DEEPSLATE_DIAMOND_ORE: 5.0
+    # Древние обломки
+    ANCIENT_DEBRIS: 10.0
 
-# ─── Farming ──────────────────────────────────
+    # ✨ Дополнительные руды (можно добавить свои)
+    # NETHER_GOLD_ORE: 2.0
+    # EMERALD_ORE: 6.0
+    # DEEPSLATE_EMERALD_ORE: 6.0
+
+# ═════════════════════════════════════════════════════════════════════
+# 🌾 2. FARMING — Опыт за фермерство
+# ═════════════════════════════════════════════════════════════════════
+# Опыт даётся только за полностью созревшие культуры.
+# Для тыквы/арбуза — за сломанный блок.
 farming:
   enabled: true
   crops:
+    # Культуры (только созревшие, age = max)
     WHEAT: 0.5
     CARROTS: 0.5
     POTATOES: 0.5
+    # Блоки (без age)
     PUMPKIN: 1.0
     MELON: 1.0
+    # Ягоды (age >= 2)
     SWEET_BERRY_BUSH: 0.5
+    # Мёд (через BlockDropItemEvent)
   honey:
     HONEY_BOTTLE: 5.0
     HONEYCOMB: 2.0
 
-# ─── Woodcutting ──────────────────────────────
+# ═════════════════════════════════════════════════════════════════════
+# 🌲 3. WOODCUTTING — Опыт за рубку деревьев
+# ═════════════════════════════════════════════════════════════════════
+# Опыт начисляется только за деревья, выросшие натурально
+# (проверка: под бревном натуральная земля/камень, рядом листва)
 woodcutting:
   enabled: true
   logs:
+    # Переопределённые дубы
     OAK_LOG: 0.2
-    SPRUCE_LOG: 0.2
-    BIRCH_LOG: 0.2
-    JUNGLE_LOG: 0.2
-    ACACIA_LOG: 0.2
     DARK_OAK_LOG: 0.2
+    # Ель
+    SPRUCE_LOG: 0.2
+    # Берёза
+    BIRCH_LOG: 0.2
+    # Тропическое дерево
+    JUNGLE_LOG: 0.2
+    # Акация
+    ACACIA_LOG: 0.2
+    # Мангровое дерево
     MANGROVE_LOG: 0.2
+    # Вишня
     CHERRY_LOG: 0.2
+    # Бледный дуб
     PALE_OAK_LOG: 0.2
+    # Адские стебли
     CRIMSON_STEM: 0.2
     WARPED_STEM: 0.2
 
-# ─── Fishing ──────────────────────────────────
+# ═════════════════════════════════════════════════════════════════════
+# 🎣 4. FISHING — Опыт за рыбалку
+# ═════════════════════════════════════════════════════════════════════
+# Начисляется за каждую пойманную рыбу (COD, SALMON, PUFFERFISH, TROPICAL_FISH)
 fishing:
   enabled: true
   xp-per-catch: 5.0
 
-# ─── Hunting ──────────────────────────────────
+# ═════════════════════════════════════════════════════════════════════
+# ⚔ 5. HUNTING — Опыт за охоту на мобов
+# ═════════════════════════════════════════════════════════════════════
+# Опыт начисляется только за натурально заспавненных мобов
+# (не из спавнера, не из яйца призыва, не через команду)
+# Используется Paper API + fallback на проверку спавнеров рядом
 hunting:
   enabled: true
-  # Natural mobs only (no spawners, no eggs)
   mobs:
+    # Враждебные мобы
     ZOMBIE: 3.0
     SKELETON: 3.0
     SPIDER: 3.0
@@ -88,27 +145,38 @@ hunting:
     ENDERMAN: 5.0
     WITCH: 5.0
     BLAZE: 6.0
+    # Адские мобы
     HOGLIN: 4.0
     PIGLIN: 3.0
     ZOMBIFIED_PIGLIN: 3.0
+    PIGLIN_BRUTE: 5.0
+    ZOGLIN: 4.0
+    GHAST: 5.0
+    # Пещерные
     CAVE_SPIDER: 3.0
+    SILVERFISH: 1.0
+    SLIME: 2.0
+    MAGMA_CUBE: 2.0
+    # Особые
     PHANTOM: 4.0
     WARDEN: 50.0
     ELDER_GUARDIAN: 20.0
     WITHER_SKELETON: 5.0
-    PILLAGER: 3.0
-    VINDICATOR: 4.0
-    EVOKER: 8.0
-    RAVAGER: 10.0
-    SILVERFISH: 1.0
-    SLIME: 2.0
-    MAGMA_CUBE: 2.0
-    GHAST: 5.0
     DROWNED: 3.0
     HUSK: 3.0
     STRAY: 3.0
     BOGGED: 3.0
     BREEZE: 6.0
     CREAKING: 5.0
-    ZOGLIN: 4.0
-    PIGLIN_BRUTE: 5.0
+    # Разбойники
+    PILLAGER: 3.0
+    VINDICATOR: 4.0
+    EVOKER: 8.0
+    RAVAGER: 10.0
+
+    # ✨ Можно добавить любых других мобов:
+    # WITHER: 100.0
+    # ENDER_DRAGON: 200.0
+    # ALLAY: 1.0
+    # FROG: 1.0
+    # GOAT: 2.0

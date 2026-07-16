@@ -18,7 +18,7 @@ public class PlayerDataManager {
         int level;
         double xp;
         int totalPlaytimeSeconds;
-        long lastDailyBonusDay;  // day-of-year when daily bonus was last claimed
+        long lastDailyBonusDay;
 
         PlayerData() {
             this.level = 0;
@@ -37,7 +37,6 @@ public class PlayerDataManager {
 
     public PlayerDataManager(CubixLevels plugin) {
         this.plugin = plugin;
-        // Listen for join/quit
         plugin.getServer().getPluginManager().registerEvents(new org.bukkit.event.Listener() {
             @org.bukkit.event.EventHandler
             public void onJoin(org.bukkit.event.player.PlayerJoinEvent e) {
@@ -94,7 +93,8 @@ public class PlayerDataManager {
         try {
             config.save(file);
         } catch (IOException e) {
-            plugin.getLogger().warning("Failed to save data for " + uuid + ": " + e.getMessage());
+            plugin.getLogger().warning(MessagesManager.format("errors.data_save", "§c⚠ Error saving player data: {error}",
+                    "error", e.getMessage()));
         }
     }
 
@@ -103,8 +103,6 @@ public class PlayerDataManager {
             save(uuid);
         }
     }
-
-    // --- Getters/Setters with auto-sync ---
 
     public int getLevel(UUID uuid) {
         PlayerData data = dataMap.get(uuid);
@@ -128,12 +126,11 @@ public class PlayerDataManager {
         plugin.getLevelManager().setXp(uuid, xp);
     }
 
-    public void addXp(UUID uuid, double amount, org.bukkit.entity.Player player) {
+    public void addXp(UUID uuid, double amount, Player player) {
         PlayerData data = dataMap.computeIfAbsent(uuid, k -> new PlayerData());
         data.xp += amount;
         plugin.getLevelManager().setXp(uuid, data.xp);
 
-        // Check for level-up
         int levelsGained = 0;
         while (data.xp >= plugin.getLevelManager().getXpForNextLevel(data.level)
                 && data.level < plugin.getLevelManager().getMaxLevel()) {
@@ -145,7 +142,8 @@ public class PlayerDataManager {
         if (levelsGained > 0) {
             setLevel(uuid, data.level);
             setXp(uuid, data.xp);
-            player.sendMessage("§a✦ §eLevel Up! §7Теперь ты §e" + data.level + " §7уровня! §a✦");
+            player.sendMessage(MessagesManager.format("xp.level_up", "§a✦ §eLevel Up! §7Now you are §e{level} §7level! §a✦",
+                    "level", String.valueOf(data.level)));
             player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
         }
     }
@@ -159,15 +157,15 @@ public class PlayerDataManager {
         PlayerData data = dataMap.computeIfAbsent(uuid, k -> new PlayerData());
         data.totalPlaytimeSeconds += seconds;
 
-        // Check playtime XP interval
         int interval = plugin.getConfig().getInt("settings.playtime-interval", 1800);
         int xpAmount = plugin.getConfig().getInt("settings.xp-per-playtime-interval", 10);
+
         if (data.totalPlaytimeSeconds % interval < seconds) {
-            // Crossed the interval boundary — grant XP
-            org.bukkit.entity.Player player = plugin.getServer().getPlayer(uuid);
+            Player player = plugin.getServer().getPlayer(uuid);
             if (player != null && player.isOnline()) {
                 addXp(uuid, xpAmount, player);
-                player.sendMessage("§7⏱ §a+" + xpAmount + " XP §7за игру (" + (interval / 60) + " мин)");
+                player.sendMessage(MessagesManager.format("xp.playtime", "§7⏱ §a+{amount} XP §7for playing ({minutes} min)",
+                        "amount", String.valueOf(xpAmount), "minutes", String.valueOf(interval / 60)));
             }
         }
     }
@@ -178,12 +176,13 @@ public class PlayerDataManager {
         return data.lastDailyBonusDay != today;
     }
 
-    public void claimDailyBonus(UUID uuid, org.bukkit.entity.Player player) {
+    public void claimDailyBonus(UUID uuid, Player player) {
         PlayerData data = dataMap.computeIfAbsent(uuid, k -> new PlayerData());
         data.lastDailyBonusDay = java.time.LocalDate.now().toEpochDay();
         int xp = plugin.getConfig().getInt("settings.daily-bonus-xp", 50);
         addXp(uuid, xp, player);
-        player.sendMessage("§6☀ §eЕжедневный бонус: §a+" + xp + " XP");
+        player.sendMessage(MessagesManager.format("xp.daily_bonus_claim", "§6☀ §eDaily bonus: §a+{amount} XP",
+                "amount", String.valueOf(xp)));
     }
 
     public void syncToManagers(UUID uuid) {

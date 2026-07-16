@@ -1,6 +1,7 @@
 package com.cubixlevels.listeners;
 
 import com.cubixlevels.CubixLevels;
+import com.cubixlevels.MessagesManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -25,15 +26,14 @@ public class WoodcuttingListener implements Listener {
         Block block = event.getBlock();
         Material type = block.getType();
 
-        // Check if it's a log
         double xp = plugin.getConfig().getDouble("woodcutting.logs." + type.name(), 0);
         if (xp <= 0) return;
 
-        // Check natural
         if (!plugin.getNaturalCheck().isNaturalLog(block)) return;
 
         plugin.getPlayerDataManager().addXp(player.getUniqueId(), xp, player);
-        player.sendMessage("§7🌲 §a+" + formatXp(xp) + " XP §7(Рубка деревьев)");
+        player.sendMessage(MessagesManager.format("xp.woodcutting", "§7🌲 §a+{amount} XP §7(Woodcutting)",
+                "amount", formatXp(xp)));
     }
 
     private String formatXp(double xp) {
