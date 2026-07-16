@@ -1,0 +1,24 @@
+name: CubixLevels
+version: '1.0.0'
+main: com.cubixlevels.CubixLevels
+api-version: '1.21'
+description: Level system for Cubix server
+author: Minecraft337
+
+softdepend:
+  - PlaceholderAPI
+
+commands:
+  cubixlevel:
+    description: Main CubixLevel command
+    aliases: [cl, level]
+    permission: cubixlevels.user
+
+permissions:
+  cubixlevels.user:
+    default: true
+  cubixlevels.admin:
+    default: op
+  cubixlevels.reload:
+    default: op
+    description: Permission to reload CubixLevels config

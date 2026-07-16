@@ -1,0 +1,114 @@
+# ─────────────────────────────────────────────
+# CubixLevels Configuration
+# ─────────────────────────────────────────────
+
+# XP settings
+settings:
+  # XP needed per level: base + (level * multiplier)
+  xp-base: 100
+  xp-multiplier: 1.5
+  max-level: 100
+
+  # Distance tracking (blocks)
+  distance-interval: 1000
+  xp-per-distance-interval: 5
+
+  # Playtime tracking (seconds)
+  playtime-interval: 1800  # 30 minutes
+  xp-per-playtime-interval: 10
+
+  # Daily bonus
+  daily-bonus-xp: 50
+
+# ─── Mining ───────────────────────────────────
+mining:
+  enabled: true
+  blocks:
+    COAL_ORE: 1
+    DEEPSLATE_COAL_ORE: 1
+    COPPER_ORE: 2
+    DEEPSLATE_COPPER_ORE: 2
+    IRON_ORE: 3
+    DEEPSLATE_IRON_ORE: 3
+    NETHER_QUARTZ_ORE: 3
+    GOLD_ORE: 4
+    DEEPSLATE_GOLD_ORE: 4
+    LAPIS_ORE: 4
+    DEEPSLATE_LAPIS_ORE: 4
+    REDSTONE_ORE: 4
+    DEEPSLATE_REDSTONE_ORE: 4
+    DIAMOND_ORE: 5
+    DEEPSLATE_DIAMOND_ORE: 5
+    ANCIENT_DEBRIS: 10
+
+# ─── Farming ──────────────────────────────────
+farming:
+  enabled: true
+  crops:
+    WHEAT: 0.5
+    CARROTS: 0.5
+    POTATOES: 0.5
+    PUMPKIN: 1.0
+    MELON: 1.0
+    SWEET_BERRY_BUSH: 0.5
+  honey:
+    HONEY_BOTTLE: 5.0
+    HONEYCOMB: 2.0
+
+# ─── Woodcutting ──────────────────────────────
+woodcutting:
+  enabled: true
+  logs:
+    OAK_LOG: 0.2
+    SPRUCE_LOG: 0.2
+    BIRCH_LOG: 0.2
+    JUNGLE_LOG: 0.2
+    ACACIA_LOG: 0.2
+    DARK_OAK_LOG: 0.2
+    MANGROVE_LOG: 0.2
+    CHERRY_LOG: 0.2
+    PALE_OAK_LOG: 0.2
+    CRIMSON_STEM: 0.2
+    WARPED_STEM: 0.2
+
+# ─── Fishing ──────────────────────────────────
+fishing:
+  enabled: true
+  xp-per-catch: 5.0
+
+# ─── Hunting ──────────────────────────────────
+hunting:
+  enabled: true
+  # Natural mobs only (no spawners, no eggs)
+  mobs:
+    ZOMBIE: 3.0
+    SKELETON: 3.0
+    SPIDER: 3.0
+    CREEPER: 4.0
+    ENDERMAN: 5.0
+    WITCH: 5.0
+    BLAZE: 6.0
+    HOGLIN: 4.0
+    PIGLIN: 3.0
+    ZOMBIFIED_PIGLIN: 3.0
+    CAVE_SPIDER: 3.0
+    PHANTOM: 4.0
+    WARDEN: 50.0
+    ELDER_GUARDIAN: 20.0
+    WITHER_SKELETON: 5.0
+    PILLAGER: 3.0
+    VINDICATOR: 4.0
+    EVOKER: 8.0
+    RAVAGER: 10.0
+    SILVERFISH: 1.0
+    SLIME: 2.0
+    MAGMA_CUBE: 2.0
+    GHAST: 5.0
+    DROWNED: 3.0
+    HUSK: 3.0
+    STRAY: 3.0
+    BOGGED: 3.0
+    BREEZE: 6.0
+    CREAKING: 5.0
+    ZOGLIN: 4.0
+    PIGLIN_BRUTE: 5.0
