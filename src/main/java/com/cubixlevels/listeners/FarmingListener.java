@@ -4,6 +4,7 @@ import com.cubixlevels.CubixLevels;
 import com.cubixlevels.MessagesManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -43,13 +44,15 @@ public class FarmingListener implements Listener {
         }
 
         if (type == Material.PUMPKIN) {
-            if (plugin.getPlacedBlockTracker().wasPlacedByPlayer(block)) {
+            if (plugin.getPlacedBlockTracker().wasPlacedByPlayer(block)
+                    || hasPlacedStemAdjacent(block, Material.PUMPKIN_STEM)) {
                 return;
             }
             grantXp(player, plugin.getConfig().getDouble("farming.crops.PUMPKIN", 1.0),
                     MessagesManager.getString("names.pumpkin", "Pumpkin"));
         } else if (type == Material.MELON) {
-            if (plugin.getPlacedBlockTracker().wasPlacedByPlayer(block)) {
+            if (plugin.getPlacedBlockTracker().wasPlacedByPlayer(block)
+                    || hasPlacedStemAdjacent(block, Material.MELON_STEM)) {
                 return;
             }
             grantXp(player, plugin.getConfig().getDouble("farming.crops.MELON", 1.0),
@@ -99,6 +102,19 @@ public class FarmingListener implements Listener {
                         plugin.getConfig().getDouble("farming.honey.HONEYCOMB", 2.0),
                         MessagesManager.getString("names.honeycomb", "Honeycomb"));
         }
+    }
+
+    private boolean hasPlacedStemAdjacent(Block fruit, Material stemType) {
+        for (BlockFace face : new BlockFace[]{
+                BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH,
+                BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST}) {
+            Block adj = fruit.getRelative(face);
+            if (adj.getType() == stemType
+                    && plugin.getPlacedBlockTracker().wasPlacedByPlayer(adj)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private double getXpForCrop(Material mat) {
