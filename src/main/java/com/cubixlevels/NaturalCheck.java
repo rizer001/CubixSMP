@@ -44,38 +44,87 @@ public class NaturalCheck {
     /**
      * Check if a log was naturally generated (not player-placed).
      * <p>
-     * Спускается по колонке брёвен вниз (до 30 блоков) в поисках натуральной
-     * почвы или камня. Это позволяет верхним брёвнам дерева тоже давать XP,
-     * а не только нижнему бревну (баг: старый код проверял только блок СНИЗУ).
+     * Алгоритм:
+     * <ol>
+     *   <li>Идём вниз от сломанного блока через брёвна И воздушные карманы
+     *       (AIR-карман = ранее сломанное бревно в этой же колонне при валке
+     *       снизу вверх). Ищем натуральную почву/камень как основание дерева.</li>
+     *   <li>Когда нашли основание — поднимаемся обратно по колонне вверх и
+     *       проверяем каждое бревно на соседство с листвой. Если у какого-то
+     *       бревна колонны рядом есть листва — это настоящее дерево. Если
+     *       листвы нигде нет — это скорее всего построенная игроком колонна
+     *       брёвен, и XP давать не надо.</li>
+     * </ol>
+     * <p>
+     * Баг #2 (фикс ниже): ранее валка деревьев работала только сверху вниз.
+     * При обратной валке (снизу вверх) снизу уже был AIR, а старый код
+     * воспринимал AIR как конец колонны и возвращал false — XP не давались.
      */
+    // Максимальная высота обхода колонны брёвен. 64 — с запасом для
+    // гигантских 2x2 jungle trees (до ~50 блоков в ваниле).
+    private static final int MAX_COLUMN_WALK = 64;
+
     public boolean isNaturalLog(Block block) {
         Block current = block;
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < MAX_COLUMN_WALK; i++) {
             Block below = current.getRelative(BlockFace.DOWN);
             Material belowType = below.getType();
 
             if (isNaturalSoil(belowType) || isNaturalStone(belowType)) {
-                // Добрались до натурального блока под деревом — проверяем листву
-                if (hasLeavesAdjacent(block)) {
-                    return true;
-                }
-                return true;
+                // Нашли натуральное основание. Теперь проверим, что над ним
+                // действительно есть листва (иначе это просто столб брёвен).
+                return hasLeavesInLogColumn(block);
             }
 
-            // Если блок снизу НЕ бревно и НЕ ствол — конец, это не дерево
+            // AIR-карман = ранее сломанное бревно в этой же колонке — пропускаем
+            if (belowType == Material.AIR || belowType == Material.CAVE_AIR) {
+                current = below;
+                continue;
+            }
+
+            // Если снизу не бревно и не воздух — это не колонна дерева
             if (!isLogLike(belowType)) {
                 return false;
             }
 
-            current = below; // продолжаем вниз по колонке
+            current = below;
+        }
+        return false;
+    }
+
+    /**
+     * Walk up the column from the broken block, checking each block (logs and
+     * air gaps from already-broken logs above) for adjacent leaves or wart blocks.
+     * Returns true if any block in the walked-up portion of the column has
+     * leaves nearby — this confirms a real tree.
+     * <p>
+     * Работает корректно при любом порядке валки: верхняя листва обычно
+     * сохраняется ещё долго после того, как все брёвна под ней сломаны.
+     */
+    private boolean hasLeavesInLogColumn(Block start) {
+        Block current = start;
+        for (int i = 0; i < MAX_COLUMN_WALK; i++) {
+            if (hasLeavesAdjacent(current)) return true;
+
+            Block above = current.getRelative(BlockFace.UP);
+            Material aboveType = above.getType();
+
+            // Останавливаемся только если над нами не бревно и не воздух
+            if (!isLogLike(aboveType) && aboveType != Material.AIR && aboveType != Material.CAVE_AIR) {
+                break;
+            }
+            current = above;
         }
         return false;
     }
 
     private boolean isLogLike(Material mat) {
         String name = mat.name();
+        // MANGROVE_ROOTS — часть колонны мангрового дерева (между нижним
+        // MANGROVE_LOG и почвой/водой); без этого мангры не дают XP
         return name.endsWith("_LOG") || name.endsWith("_WOOD")
-                || name.endsWith("_STEM") || name.endsWith("_HYPHAE");
+                || name.endsWith("_STEM") || name.endsWith("_HYPHAE")
+                || name.equals("MANGROVE_ROOTS");
     }
 
     private boolean hasLeavesAdjacent(Block block) {
