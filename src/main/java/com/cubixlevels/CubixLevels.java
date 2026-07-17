@@ -11,7 +11,9 @@ public final class CubixLevels extends JavaPlugin {
     private LevelManager levelManager;
     private PlayerDataManager playerDataManager;
     private NaturalCheck naturalCheck;
-    private CubixPlaceholderExpansion placeholderExpansion;    private boolean hasPlaceholderAPI;
+    private PlacedBlockTracker placedBlockTracker;
+    private CubixPlaceholderExpansion placeholderExpansion;
+    private boolean hasPlaceholderAPI;
 
     @Override
     public void onEnable() {
@@ -26,6 +28,7 @@ public final class CubixLevels extends JavaPlugin {
 
         // Load managers
         this.naturalCheck = new NaturalCheck();
+        this.placedBlockTracker = new PlacedBlockTracker(this);
         this.playerDataManager = new PlayerDataManager(this);
         this.levelManager = new LevelManager(this);
 
@@ -38,6 +41,9 @@ public final class CubixLevels extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new DistanceListener(this), this);
         getServer().getPluginManager().registerEvents(new PlaytimeListener(this), this);
         getServer().getPluginManager().registerEvents(new DailyBonusListener(this), this);
+
+        // Трекер поставленных блоков (для проверки натуральности)
+        getServer().getPluginManager().registerEvents(placedBlockTracker, this);
 
         // Register command + tab completer
         getCommand("cubixlevel").setExecutor(new CubixLevelCommand(this));
@@ -90,6 +96,7 @@ public final class CubixLevels extends JavaPlugin {
     public LevelManager getLevelManager() { return levelManager; }
     public PlayerDataManager getPlayerDataManager() { return playerDataManager; }
     public NaturalCheck getNaturalCheck() { return naturalCheck; }
+    public PlacedBlockTracker getPlacedBlockTracker() { return placedBlockTracker; }
     public boolean hasPlaceholderAPI() { return hasPlaceholderAPI; }
 
     public void setLastAction(java.util.UUID uuid, String action) {

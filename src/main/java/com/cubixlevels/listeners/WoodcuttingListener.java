@@ -29,6 +29,12 @@ public class WoodcuttingListener implements Listener {
         double xp = plugin.getConfig().getDouble("woodcutting.logs." + type.name(), 0);
         if (xp <= 0) return;
 
+        // Трекер: поставленные игроком брёвна не дают XP
+        if (plugin.getPlacedBlockTracker().wasPlacedByPlayer(block)) {
+            return;
+        }
+
+        // Fallback: статический анализ для блоков, поставленных до установки плагина
         if (!plugin.getNaturalCheck().isNaturalLog(block)) return;
 
         plugin.getPlayerDataManager().addXp(player.getUniqueId(), xp, player);

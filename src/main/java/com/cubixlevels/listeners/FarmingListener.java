@@ -34,14 +34,24 @@ public class FarmingListener implements Listener {
             if (block.getBlockData() instanceof Ageable ageable) {
                 if (ageable.getAge() < ageable.getMaximumAge()) return;
             }
+            // Трекер: посаженные игроком культуры не дают XP
+            if (plugin.getPlacedBlockTracker().wasPlacedByPlayer(block)) {
+                return;
+            }
             grantXp(player, xp, getCropName(type));
             return;
         }
 
         if (type == Material.PUMPKIN) {
+            if (plugin.getPlacedBlockTracker().wasPlacedByPlayer(block)) {
+                return;
+            }
             grantXp(player, plugin.getConfig().getDouble("farming.crops.PUMPKIN", 1.0),
                     MessagesManager.getString("names.pumpkin", "Pumpkin"));
         } else if (type == Material.MELON) {
+            if (plugin.getPlacedBlockTracker().wasPlacedByPlayer(block)) {
+                return;
+            }
             grantXp(player, plugin.getConfig().getDouble("farming.crops.MELON", 1.0),
                     MessagesManager.getString("names.melon", "Melon"));
         }
@@ -57,6 +67,10 @@ public class FarmingListener implements Listener {
         if (type == Material.SWEET_BERRY_BUSH) {
             if (event.getClickedBlock().getBlockData() instanceof Ageable ageable) {
                 if (ageable.getAge() >= 2) {
+                    // Трекер: посаженные игроком кусты не дают XP
+                    if (plugin.getPlacedBlockTracker().wasPlacedByPlayer(event.getClickedBlock())) {
+                        return;
+                    }
                     grantXp(event.getPlayer(),
                             plugin.getConfig().getDouble("farming.crops.SWEET_BERRY_BUSH", 0.5),
                             MessagesManager.getString("names.berry", "Berries"));
@@ -70,6 +84,10 @@ public class FarmingListener implements Listener {
         if (!plugin.getConfig().getBoolean("farming.enabled", true)) return;
         Material type = event.getBlockState().getType();
         if (type != Material.BEE_NEST && type != Material.BEEHIVE) return;
+        // Трекер: ульи, поставленные игроком, не дают XP
+        if (plugin.getPlacedBlockTracker().wasPlacedByPlayer(event.getBlock())) {
+            return;
+        }
         for (var item : event.getItems()) {
             Material dropType = item.getItemStack().getType();
             if (dropType == Material.HONEY_BOTTLE)

@@ -29,6 +29,12 @@ public class MiningListener implements Listener {
         double xp = getXpForBlock(type);
         if (xp <= 0) return;
 
+        // Сначала проверяем трекер: если блок поставлен игроком — XP не начисляется
+        if (plugin.getPlacedBlockTracker().wasPlacedByPlayer(block)) {
+            return;
+        }
+
+        // Fallback: статический анализ для блоков, поставленных до установки плагина
         if (!plugin.getNaturalCheck().isNaturalOre(block)) return;
 
         plugin.getPlayerDataManager().addXp(player.getUniqueId(), xp, player);
