@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import static com.cubixlevels.PlayerDataManager.formatXp;
 import java.util.List;
 
 public class CubixLevelCommand implements CommandExecutor {
@@ -36,6 +37,8 @@ public class CubixLevelCommand implements CommandExecutor {
             case "daily" -> handleDaily(sender);
             case "stats" -> handleStats(sender);
             case "admin" -> handleAdmin(sender, args);
+            case "sound" -> handleSound(sender);
+            case "leaders" -> handleLeaders(sender);
             default -> handleHelp(sender);
         };
     }
@@ -83,7 +86,9 @@ public class CubixLevelCommand implements CommandExecutor {
         if (sender.hasPermission("cubixlevels.admin")) {
             for (String line : MessagesManager.getStringList("command.help_admin",
                     List.of("§e/cubixlevel §7— stats", "§e/cubixlevel stats §7— stats",
-                            "§e/cubixlevel daily §7— daily bonus", "§e/cubixlevel reload §7— reload config",
+                            "§e/cubixlevel daily §7— daily bonus", "§e/cubixlevel sound §7— toggle XP sound",
+                            "§e/cubixlevel leaders §7— top players",
+                            "§e/cubixlevel reload §7— reload config",
                             "§e/cubixlevel admin §7— admin commands"))) {
                 sender.sendMessage(line);
             }
@@ -91,7 +96,9 @@ public class CubixLevelCommand implements CommandExecutor {
             sender.sendMessage(MessagesManager.format("command.help_header", "§6CubixLevels §7v{version}",
                     "version", plugin.getDescription().getVersion()));
             for (String line : MessagesManager.getStringList("command.help_player",
-                    List.of("§e/cubixlevel §7— stats", "§e/cubixlevel daily §7— daily bonus"))) {
+                    List.of("§e/cubixlevel §7— stats", "§e/cubixlevel daily §7— daily bonus",
+                            "§e/cubixlevel sound §7— toggle XP sound",
+                            "§e/cubixlevel leaders §7— top players"))) {
                 sender.sendMessage(line);
             }
         }
@@ -362,6 +369,52 @@ public class CubixLevelCommand implements CommandExecutor {
         return true;
     }
 
+    // ─── Sound toggle ───────────────────────────
+
+    private boolean handleSound(CommandSender sender) {
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(MessagesManager.getString("general.player_only", "§c❌ Only players can use this command!"));
+            return true;
+        }
+        boolean newState = plugin.getPlayerDataManager().toggleSound(player.getUniqueId());
+        if (newState) {
+            player.sendMessage(MessagesManager.getString("command.sound_on", "§a✔ Звук XP §a§lВКЛЮЧЁН"));
+        } else {
+            player.sendMessage(MessagesManager.getString("command.sound_off", "§c✔ Звук XP §c§lВЫКЛЮЧЕН"));
+        }
+        return true;
+    }
+
+    // ─── Leaders (топ игроков) ───────────────────
+
+    private boolean handleLeaders(CommandSender sender) {
+        int limit = plugin.getConfig().getInt("settings.leaders-limit", 10);
+        java.util.List<String[]> top = plugin.getPlayerDataManager().getTopPlayers(limit);
+
+        sender.sendMessage(MessagesManager.format("leaders.header", "§6╔═══════════════════════════════╗",
+                "limit", String.valueOf(limit)));
+        sender.sendMessage(MessagesManager.getString("leaders.title", "§6║ §lТоп игроков §r§6              ║"));
+        sender.sendMessage(MessagesManager.getString("leaders.footer", "§6╚═══════════════════════════════╝"));
+
+        if (top.isEmpty()) {
+            sender.sendMessage(MessagesManager.getString("leaders.empty", "§7Пока нет данных для топа."));
+            return true;
+        }
+
+        int i = 1;
+        String format = MessagesManager.getString("leaders.entry_format", "§f#{rank} §e{player} §7— §eУровень {level} §7({xp} XP)");
+        for (String[] entry : top) {
+            String line = format
+                    .replace("{rank}", String.valueOf(i))
+                    .replace("{player}", entry[0])
+                    .replace("{level}", entry[1])
+                    .replace("{xp}", entry[2]);
+            sender.sendMessage(line);
+            i++;
+        }
+        return true;
+    }
+
     // ─── Вспомогательные методы ────────────────
 
     private void showStats(Player player) {
@@ -399,11 +452,6 @@ public class CubixLevelCommand implements CommandExecutor {
         for (int i = bars; i < 10; i++) sb.append(empty);
         sb.append("§7]");
         return sb.toString();
-    }
-
-    private String formatXp(double xp) {
-        if (xp == (long) xp) return String.valueOf((long) xp);
-        return String.format("%.1f", xp);
     }
 
     private String formatPlaytime(int seconds) {

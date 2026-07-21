@@ -19,19 +19,22 @@ public class PlayerDataManager {
         double xp;
         int totalPlaytimeSeconds;
         long lastDailyBonusDay;
+        boolean soundEnabled;
 
         PlayerData() {
             this.level = 0;
             this.xp = 0;
             this.totalPlaytimeSeconds = 0;
             this.lastDailyBonusDay = 0;
+            this.soundEnabled = true;
         }
 
-        PlayerData(int level, double xp, int totalPlaytimeSeconds, long lastDailyBonusDay) {
+        PlayerData(int level, double xp, int totalPlaytimeSeconds, long lastDailyBonusDay, boolean soundEnabled) {
             this.level = level;
             this.xp = xp;
             this.totalPlaytimeSeconds = totalPlaytimeSeconds;
             this.lastDailyBonusDay = lastDailyBonusDay;
+            this.soundEnabled = soundEnabled;
         }
     }
 
@@ -75,7 +78,8 @@ public class PlayerDataManager {
                 config.getInt("level", 0),
                 config.getDouble("xp", 0),
                 config.getInt("playtime", 0),
-                config.getLong("daily-bonus-day", 0)
+                config.getLong("daily-bonus-day", 0),
+                config.getBoolean("sound-enabled", true)
         );
         dataMap.put(uuid, data);
         syncToManagers(uuid);
@@ -90,6 +94,7 @@ public class PlayerDataManager {
         config.set("xp", data.xp);
         config.set("playtime", data.totalPlaytimeSeconds);
         config.set("daily-bonus-day", data.lastDailyBonusDay);
+        config.set("sound-enabled", data.soundEnabled);
         try {
             config.save(file);
         } catch (IOException e) {
@@ -131,6 +136,11 @@ public class PlayerDataManager {
         data.xp += amount;
         plugin.getLevelManager().setXp(uuid, data.xp);
 
+        // 🔔 Звук получения опыта (с возможностью отключения)
+        if (amount > 0 && data.soundEnabled && player.isOnline()) {
+            player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5f, 1.0f);
+        }
+
         int levelsGained = 0;
         while (data.xp >= plugin.getLevelManager().getXpForNextLevel(data.level)
                 && data.level < plugin.getLevelManager().getMaxLevel()) {
@@ -144,11 +154,8 @@ public class PlayerDataManager {
             setXp(uuid, data.xp);
             String msg = MessagesManager.format("xp.level_up", "§a✦ §eLevel Up! §7Now you are §e{level} §7level! §a✦",
                     "level", String.valueOf(data.level));
-            if (plugin.getConfig().getBoolean("settings.use-actionbar", true)) {
-                player.sendActionBar(net.kyori.adventure.text.Component.text(msg));
-            } else {
-                player.sendMessage(msg);
-            }
+            // 🐛 Фикс: level-up ВСЕГДА в чат, не в actionbar (чтобы не перекрывался XP-сообщениями)
+            player.sendMessage(msg);
             player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
         }
     }
@@ -200,6 +207,98 @@ public class PlayerDataManager {
         } else {
             player.sendMessage(msg);
         }
+    }
+
+    /**
+     * Переключает звук XP для игрока. Возвращает новое состояние (true = звук включён).
+     */
+    public boolean toggleSound(UUID uuid) {
+        PlayerData data = dataMap.computeIfAbsent(uuid, k -> new PlayerData());
+        data.soundEnabled = !data.soundEnabled;
+        save(uuid);
+        return data.soundEnabled;
+    }
+
+    /**
+     * Проверяет, включён ли звук XP для игрока.
+     */
+    public boolean isSoundEnabled(UUID uuid) {
+        PlayerData data = dataMap.get(uuid);
+        return data == null || data.soundEnabled; // по умолчанию true
+    }
+
+    /**
+     * Возвращает топ-N игроков по уровню (а если уровень равен — по XP).
+     * Читает данные из файлов playerdata/ для офлайн-игроков,
+     * а для онлайн-игроков берёт актуальные данные из dataMap.
+     *
+     * @param limit количество записей в топе
+     * @return список массивов [name, level, xp]
+     */
+    public java.util.List<String[]> getTopPlayers(int limit) {
+        java.util.List<String[]> result = new java.util.ArrayList<>();
+        File folder = plugin.getPlayerDataFolder();
+        File[] files = folder.listFiles((dir, name) -> name.endsWith(".yml"));
+        if (files == null) return result;
+
+        java.util.List<PlayerSnapshot> snapshots = new java.util.ArrayList<>();
+
+        for (File f : files) {
+            String name = f.getName().replace(".yml", "");
+            try {
+                UUID uuid = UUID.fromString(name);
+                // 🐛 Фикс: для онлайн-игроков берём данные из dataMap (они актуальнее файла)
+                PlayerData liveData = dataMap.get(uuid);
+                int level;
+                double xp;
+                if (liveData != null) {
+                    level = liveData.level;
+                    xp = liveData.xp;
+                } else {
+                    YamlConfiguration config = YamlConfiguration.loadConfiguration(f);
+                    level = config.getInt("level", 0);
+                    xp = config.getDouble("xp", 0);
+                }
+                if (level > 0 || xp > 0) {
+                    snapshots.add(new PlayerSnapshot(uuid, level, xp));
+                }
+            } catch (IllegalArgumentException ignored) {}
+        }
+
+        // Сортируем: по убыванию level, затем по убыванию xp
+        snapshots.sort((a, b) -> {
+            if (a.level != b.level) return b.level - a.level;
+            return Double.compare(b.xp, a.xp);
+        });
+
+        // Берём топ-N
+        int count = Math.min(limit, snapshots.size());
+        for (int i = 0; i < count; i++) {
+            PlayerSnapshot ps = snapshots.get(i);
+            org.bukkit.OfflinePlayer offline = plugin.getServer().getOfflinePlayer(ps.uuid);
+            String displayName = offline.getName() != null ? offline.getName() : ps.uuid.toString().substring(0, 8);
+            result.add(new String[]{displayName, String.valueOf(ps.level), formatXp(ps.xp)});
+        }
+
+        return result;
+    }
+
+    /** Вспомогательный статический класс для сортировки */
+    private static class PlayerSnapshot {
+        final UUID uuid;
+        final int level;
+        final double xp;
+        PlayerSnapshot(UUID uuid, int level, double xp) {
+            this.uuid = uuid;
+            this.level = level;
+            this.xp = xp;
+        }
+    }
+
+    /** Пакетный утилитарный метод: красивое форматирование XP */
+    static String formatXp(double xp) {
+        if (xp == (long) xp) return String.valueOf((long) xp);
+        return String.format("%.1f", xp);
     }
 
     public void syncToManagers(UUID uuid) {

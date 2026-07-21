@@ -64,6 +64,11 @@ public class PlacedBlockTracker implements Listener {
     }
 
     private boolean isCrop(Material mat) {
+        // PUMPKIN/MELON ТРЕКАЮТСЯ: единственная проверка «плод натуральный?» —
+        // wasPlacedByPlayer(сам_плод). Если игрок поставил плод напрямую через /setblock
+        // или creative — BlockPlaceEvent зарегистрирует координату, и FarmingListener
+        // откажет в XP. Если плод ВЫРОС из стебля (или сгенерирован миром) — события
+        // размещения нет, проверка возвращает false → XP выдаётся.
         return switch (mat) {
             case WHEAT, CARROTS, POTATOES, BEETROOTS,
                  NETHER_WART, COCOA,

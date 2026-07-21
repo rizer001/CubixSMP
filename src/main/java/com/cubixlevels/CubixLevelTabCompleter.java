@@ -13,9 +13,9 @@ import java.util.List;
 
 public class CubixLevelTabCompleter implements TabCompleter {
 
-    private static final List<String> PLAYER_COMMANDS = List.of("daily", "stats");
+    private static final List<String> PLAYER_COMMANDS = List.of("daily", "stats", "sound", "leaders");
     private static final List<String> ADMIN_COMMANDS = List.of(
-            "reload", "daily", "stats", "admin"
+            "reload", "daily", "stats", "sound", "leaders", "admin"
     );
     private static final List<String> ADMIN_SUBCOMMANDS = List.of(
             "info", "setlevel", "addxp", "removexp", "reset"
@@ -31,6 +31,8 @@ public class CubixLevelTabCompleter implements TabCompleter {
             List<String> commands = new ArrayList<>();
             commands.add("daily");
             commands.add("stats");
+            commands.add("sound");
+            commands.add("leaders");
             if (sender.hasPermission("cubixlevels.reload")) {
                 commands.add("reload");
             }

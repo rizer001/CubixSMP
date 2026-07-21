@@ -44,20 +44,24 @@ public class FarmingListener implements Listener {
         }
 
         if (type == Material.PUMPKIN) {
-            // 🐛 Фикс: проверяем ATTACHED_PUMPKIN_STEM тоже, т.к. в Minecraft 1.21+
-            // стебель тыквы превращается в ATTACHED_PUMPKIN_STEM когда плод вырос.
-            if (plugin.getPlacedBlockTracker().wasPlacedByPlayer(block)
-                    || hasPlacedStemAdjacent(block, Material.PUMPKIN_STEM)
-                    || hasPlacedStemAdjacent(block, Material.ATTACHED_PUMPKIN_STEM)) {
+            // 🐛 Фикс №2 (v26.2): пользователь жаловался что «проверка на натуральные блоки
+            // тыкв не работает». Прежняя логика делала ОТКАЗ по двум причинам:
+            //   (a) сам плод был поставлен игроком через /setblock
+            //   (b) рядом стоит стебель, отмеченный как поставленный игроком
+            // Причина (b) слишком строгая: плод, ВЫРОСШИЙ из посаженного игроком стебля
+            // по-прежнему «вырос сам» (= «естественная генерация в рамках посева»), и по правилу
+            // «выросла сама / была найдена / была сгенерирована → даём опыт» должен попадать
+            // под положительный кейс. Поэтому теперь проверяем ТОЛЬКО прямой факт размещения
+            // самого ПЛОДА игроком (то же поведение, что у пшеницы/моркови — те тоже не
+            // проверяют wasPlacedByPlayer на самом блоке культуры).
+            if (plugin.getPlacedBlockTracker().wasPlacedByPlayer(block)) {
                 return;
             }
             grantXp(player, plugin.getConfig().getDouble("farming.crops.PUMPKIN", 1.0),
                     MessagesManager.getString("names.pumpkin", "Pumpkin"));
         } else if (type == Material.MELON) {
-            // 🐛 Фикс: аналогично для арбуза
-            if (plugin.getPlacedBlockTracker().wasPlacedByPlayer(block)
-                    || hasPlacedStemAdjacent(block, Material.MELON_STEM)
-                    || hasPlacedStemAdjacent(block, Material.ATTACHED_MELON_STEM)) {
+            // 🐛 Фикс №2: аналогично тыкве — проверяем только прямую постановку самого ПЛОДА.
+            if (plugin.getPlacedBlockTracker().wasPlacedByPlayer(block)) {
                 return;
             }
             grantXp(player, plugin.getConfig().getDouble("farming.crops.MELON", 1.0),
@@ -106,18 +110,8 @@ public class FarmingListener implements Listener {
         }
     }
 
-    private boolean hasPlacedStemAdjacent(Block fruit, Material stemType) {
-        for (BlockFace face : new BlockFace[]{
-                BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH,
-                BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST}) {
-            Block adj = fruit.getRelative(face);
-            if (adj.getType() == stemType
-                    && plugin.getPlacedBlockTracker().wasPlacedByPlayer(adj)) {
-                return true;
-            }
-        }
-        return false;
-    }
+    // (Удалён helper hasPlacedStemAdjacent — после #№2-фикса проверка соседних стеблей
+    // не нужна: плод сам по себе натуральный, если напрямую не был размещён игроком.)
 
     private double getXpForCrop(Material mat) {
         return plugin.getConfig().getDouble("farming.crops." + mat.name(), 0);

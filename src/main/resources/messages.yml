@@ -60,12 +60,27 @@ command:
   help_player:
     - "§e/cubixlevel §7— показать статистику"
     - "§e/cubixlevel daily §7— ежедневный бонус"
+    - "§e/cubixlevel sound §7— вкл/выкл звук XP"
+    - "§e/cubixlevel leaders §7— топ игроков"
   help_admin:
     - "§e/cubixlevel §7— показать статистику"
     - "§e/cubixlevel stats §7— статистика"
     - "§e/cubixlevel daily §7— ежедневный бонус"
+    - "§e/cubixlevel sound §7— вкл/выкл звук XP"
+    - "§e/cubixlevel leaders §7— топ игроков"
     - "§e/cubixlevel reload §7— перезагрузить конфиг"
     - "§e/cubixlevel admin <sub> §7— админ-команды"
+
+  # Звук XP
+  sound_on: "§a✔ Звук XP §a§lВКЛЮЧЁН"
+  sound_off: "§c✔ Звук XP §c§lВЫКЛЮЧЕН"
+
+  # Топ игроков
+  leaders_header: "§6╔═══════════════════════════════╗"
+  leaders_title: "§6║ §lТоп игроков §r§6              ║"
+  leaders_footer: "§6╚═══════════════════════════════╝"
+  leaders_empty: "§7Пока нет данных для топа."
+  leaders_entry_format: "§f#{rank} §e{player} §7— §eУровень {level} §7({xp} XP)"
 
 # ─── Админ-команды ───────────────────────────
 admin:
