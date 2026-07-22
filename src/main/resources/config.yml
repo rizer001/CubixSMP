@@ -1,12 +1,15 @@
 # ╔════════════════════════════════════════════════════════════════════╗
-# ║                    CubixLevels Configuration                      ║
-# ║                       Version 1.0.0                               ║
+# ║                    CubixSMP Configuration                         ║
+# ║                       Version 1.2                                 ║
 # ╚════════════════════════════════════════════════════════════════════╝
-# 
-# Основные настройки плагина CubixLevels.
-# Подробное описание всех опций — в plugin-guide.txt
 #
-# При изменении этого файла используйте /cubixlevel reload
+# 🔗 Полное руководство: https://github.com/rizer001/CubixSMP
+#
+# ═════════════════════════════════════════════════════════════════════
+# 📊 НАСТРОЙКИ СИСТЕМЫ УРОВНЕЙ
+# ═════════════════════════════════════════════════════════════════════
+# Настройки расположены сверху, сообщения — снизу (раздел "messages:").
+# При изменении этого файла используйте /cubixsmp reload
 # или перезагрузите сервер.
 
 # ─────────────────────────────────────────────
@@ -31,10 +34,10 @@ settings:
   xp-per-playtime-interval: 10
 
   # ☀ Ежедневный бонус
-  daily-bonus-xp: 50          # XP за /cubixlevel daily
+  daily-bonus-xp: 50          # XP за /cubixsmp daily
 
   # 👑 Топ игроков
-  leaders-limit: 10           # сколько игроков показывать в /cubixlevel leaders
+  leaders-limit: 10           # сколько игроков показывать в /cubixsmp leaders
 
 # ═════════════════════════════════════════════════════════════════════
 # ⛏ 1. MINING — Опыт за добычу руд
@@ -82,6 +85,8 @@ mining:
 # Для тыквы/арбуза — за сломанный блок.
 farming:
   enabled: true
+  # 🚫 Отключить вытаптывание грядок (игроки и мобы не превращают FARMLAND в DIRT)
+  no-trampling: true
   crops:
     # Культуры (только созревшие, age = max)
     WHEAT: 0.5
@@ -104,6 +109,8 @@ farming:
 # (проверка: под бревном натуральная земля/камень, рядом листва)
 woodcutting:
   enabled: true
+  # 🪓 Топор не теряет прочность при ломании листвы (удобно при рубке деревьев)
+  axe-no-durability-loss: true
   logs:
     # Переопределённые дубы
     OAK_LOG: 0.2
@@ -186,3 +193,231 @@ hunting:
     # ALLAY: 1.0
     # FROG: 1.0
     # GOAT: 2.0
+
+# ═════════════════════════════════════════════════════════════════════
+# 📢 6. CHAT PING — @пнг в чате
+# ═════════════════════════════════════════════════════════════════════
+# Позволяет пинговать игроков через @ник, @everyone, @admins в чате.
+# Пингуемый текст выделяется жирным + подчёркнутым.
+# Пингуемые игроки слышат звуковой сигнал (можно отключить через /csmp ping).
+chat-ping:
+  enabled: true
+  # Формат пинга (LEGACY). &l = жирный, &n = подчёркнутый, &r = сброс
+  mention-format: "&l&n@%s&r"
+  # Звук пинга (название из Minecraft: ENTITY_EXPERIENCE_ORB_PICKUP, BLOCK_NOTE_BLOCK_PLING и т.д.)
+  ping-sound: "BLOCK_NOTE_BLOCK_PLING"
+  # Громкость звука пинга (0.0 - 2.0)
+  ping-sound-volume: 0.8
+  # Высота звука пинга (0.5 - 2.0)
+  ping-sound-pitch: 1.5
+  # Типы пингов
+  ping-types:
+    # @everyone — пинг всех онлайн-игроков
+    everyone:
+      enabled: true
+      # Право для использования @everyone (по умолчанию у всех)
+      permission: "cubixsmp.ping.everyone"
+    # @admins / @admin / @ops — пинг администрации
+    admins:
+      enabled: true
+      # Право для использования @admins
+      permission: "cubixsmp.ping.admins"
+      # Кто считается админом (цель для пинга). Игроки с этим правом будут слышать @admins
+      target-permission: "cubixsmp.ping.admins-target"
+
+# ═════════════════════════════════════════════════════════════════════
+# 🔄 7. CHAT PLACEHOLDERS — Пер-плеерные плейсхолдеры в чате
+# ═════════════════════════════════════════════════════════════════════
+# Когда игрок пишет в чат сообщение с %cubixsmp_...% — каждый получатель
+# видит это заменённым на СВОЁ значение (не значение отправителя).
+# Пример: "Мой ур. %cubixsmp_level%" → Игрок Б увидит свой уровень.
+chat-placeholders:
+  enabled: true
+
+# ═════════════════════════════════════════════════════════════════════
+# 📊 8. PLAYTIME TRACKER — Ежедневный онлайн игроков
+# ═════════════════════════════════════════════════════════════════════
+# Трекинг времени входа/выхода с разбивкой по дням.
+# Логи хранятся N дней, после чего автоматически очищаются.
+# Команда: /checkonline [ник]
+playtime-tracker:
+  enabled: true
+  # Сколько дней хранить логи (старые автоматически удаляются)
+  log-retention-days: 7
+  # Интервал автосохранения в минутах
+  auto-save-interval: 5
+  # Интервал автоочистки в минутах
+  auto-cleanup-interval: 60
+
+# ═════════════════════════════════════════════════════════════════════
+# 💬 СООБЩЕНИЯ ПЛАГИНА (переводимые)
+# ═════════════════════════════════════════════════════════════════════
+# Все сообщения, которые плагин отправляет игрокам.
+# Вы можете переводить и изменять их без перекомпиляции JAR.
+#
+# После изменения выполните /cubixsmp reload.
+#
+# Цветовые коды:
+#   §0-§f — стандартные Minecraft цвета
+#   §l — жирный   §n — подчёркнутый   §o — курсив   §m — зачёркнутый
+#
+# Плейсхолдеры (заменяются автоматически):
+#   {player}  — имя игрока
+#   {level}   — уровень
+#   {xp}      — количество опыта
+#   {needed}  — XP до следующего уровня
+#   {max}     — максимальный уровень
+#   {amount}  — количество (XP, блоков, минут и т.д.)
+#   {action}  — название действия (шахтёрство, фермерство и т.д.)
+#   {target}  — целевой игрок (для админ-команд)
+messages:
+  # ─── Общие сообщения ─────────────────────────
+  general:
+    player_only: "§c❌ Только игрок может использовать эту команду!"
+    no_permission: "§c❌ У вас нет прав на это действие!"
+    player_not_found: "§c❌ Игрок §e{player} §cне найден!"
+    config_reloaded: "§a✔ Конфигурация CubixSMP перезагружена!"
+    already_daily: "§c❌ Вы уже получили ежедневный бонус сегодня!"
+    console_not_allowed: "§c❌ Эту команду нельзя выполнять из консоли без указания игрока!"
+
+  # ─── XP Уведомления ──────────────────────────
+  xp:
+    mining: "§7⛏ §a+{amount} XP §7(Шахтёрство)"
+    farming: "§7🌾 §a+{amount} XP §7({action})"
+    woodcutting: "§7🌲 §a+{amount} XP §7(Рубка деревьев)"
+    fishing: "§7🎣 §a+{amount} XP §7(Рыбалка)"
+    hunting: "§7⚔ §a+{amount} XP §7({action})"
+    distance: "§7🚶 §a+{amount} XP §7(Пройдено {blocks} блоков)"
+    playtime: "§7⏱ §a+{amount} XP §7за игру ({minutes} мин)"
+    daily_bonus_claim: "§6☀ §eЕжедневный бонус: §a+{amount} XP"
+    level_up: "§a✦ §eLevel Up! §7Теперь ты §e{level} §7уровня! §a✦"
+
+  # ─── Названия действий (для xp.farming и xp.hunting) ──
+  names:
+    wheats: "Пшеница"
+    carrots: "Морковь"
+    potatoes: "Картошка"
+    pumpkin: "Тыква"
+    melon: "Арбуз"
+    berry: "Ягоды"
+    honey_bottle: "Мёд"
+    honeycomb: "Соты"
+
+  # ─── Команда /cubixsmp ─────────────────────
+  command:
+    help_header: "§6CubixSMP §7v{version}"
+    help_player:
+      - "§e/cubixsmp §7— показать статистику"
+      - "§e/cubixsmp daily §7— ежедневный бонус"
+      - "§e/cubixsmp sound §7— вкл/выкл звук XP"
+      - "§e/cubixsmp leaders §7— топ игроков"
+    help_admin:
+      - "§e/cubixsmp §7— показать статистику"
+      - "§e/cubixsmp stats §7— статистика"
+      - "§e/cubixsmp daily §7— ежедневный бонус"
+      - "§e/cubixsmp sound §7— вкл/выкл звук XP"
+      - "§e/cubixsmp leaders §7— топ игроков"
+      - "§e/cubixsmp reload §7— перезагрузить конфиг"
+      - "§e/cubixsmp admin <sub> §7— админ-команды"
+
+    # Звук XP
+    sound_on: "§a✔ Звук XP §a§lВКЛЮЧЁН"
+    sound_off: "§c✔ Звук XP §c§lВЫКЛЮЧЕН"
+
+    # Топ игроков
+    leaders_header: "§6╔═══════════════════════════════╗"
+    leaders_title: "§6║ §lТоп игроков §r§6              ║"
+    leaders_footer: "§6╚═══════════════════════════════╝"
+    leaders_empty: "§7Пока нет данных для топа."
+    leaders_entry_format: "§f#{rank} §e{player} §7— §eУровень {level} §7({xp} XP)"
+
+  # ─── Админ-команды ───────────────────────────
+  admin:
+    help_header: "§6╔═══════════════════════════════╗"
+    help_title: "§6║ §lCubixSMP Admin §r§6       ║"
+    help_footer: "§6╚═══════════════════════════════╝"
+    help_commands:
+      - "§e/cs admin info <player> §7— информация об игроке"
+      - "§e/cs admin setlevel <player> <level> §7— установить уровень"
+      - "§e/cs admin addxp <player> <amount> §7— добавить опыт"
+      - "§e/cs admin removexp <player> <amount> §7— забрать опыт"
+      - "§e/cs admin reset <player> §7— сбросить прогресс"
+    no_permission: "§c❌ У вас нет прав на админ-команды!"
+    unknown_subcommand: "§c❌ Неизвестная подкоманда. Используйте §e/cubixsmp admin §7для справки."
+
+    # Установка уровня
+    setlevel_usage: "§c❌ Использование: §e/cubixsmp admin setlevel <player> <level>"
+    setlevel_invalid_level: "§c❌ Уровень должен быть числом от 0 до {max}!"
+    setlevel_success: "§a✔ Уровень игрока §e{target} §aустановлен на §e{level}§a!"
+    setlevel_notified: "§e✦ §aАдминистратор установил твой уровень: §e{level}"
+
+    # Добавление XP
+    addxp_usage: "§c❌ Использование: §e/cubixsmp admin addxp <player> <amount>"
+    addxp_invalid_amount: "§c❌ Количество XP должно быть положительным числом!"
+    addxp_success: "§a✔ Добавлено §e{amount} XP §aигроку §e{target}§a!"
+    addxp_notified: "§e✦ §aАдминистратор добавил тебе §e{amount} XP"
+
+    # Забирание XP
+    removexp_usage: "§c❌ Использование: §e/cubixsmp admin removexp <player> <amount>"
+    removexp_invalid_amount: "§c❌ Количество XP должно быть положительным числом!"
+    removexp_success: "§a✔ Забрано §e{amount} XP §aу игрока §e{target}§a!"
+    removexp_notified: "§e✦ §cАдминистратор забрал у тебя §e{amount} XP"
+
+    # Сброс игрока
+    reset_usage: "§c❌ Использование: §e/cubixsmp admin reset <player>"
+    reset_confirm: "§c⚠ Вы уверены? Используйте §e/cubixsmp admin reset {target} confirm"
+    reset_success: "§a✔ Прогресс игрока §e{target} §aсброшен!"
+    reset_notified: "§c✦ Ваш прогресс CubixSMP был сброшен администратором!"
+
+    # Информация об игроке
+    info_header: "§6╔═══════════════════════════════╗"
+    info_name: "§6║ §lИнформация: §e{target}"
+    info_footer: "§6╚═══════════════════════════════╝"
+    info_uuid: "§eUUID: §f{uuid}"
+    info_level: "§eУровень: §f{level} §7/ {max}"
+    info_xp: "§eОпыт: §f{xp} XP"
+    info_xp_needed: "§eДо следующего уровня: §f{needed} XP §7({percent}%)"
+    info_playtime: "§eВремя игры: §f{playtime}"
+    info_progress_bar: "§eПрогресс: §f{progress}"
+
+  # ─── Статистика игрока ───────────────────────
+  stats:
+    header: "§6╔══════════════════════════════╗"
+    title: "§6║ §lCubixSMP §r§6— Твой прогресс ║"
+    footer: "§6╚══════════════════════════════╝"
+    level: "§e✦ Уровень: §f{level} §7/ {max}"
+    xp: "§e✦ Опыт: §f{xp} §7/ {needed} XP"
+    progress: "§e✦ Прогресс: §f{percent}%"
+    max_level: "§6✦ §lМАКСИМАЛЬНЫЙ УРОВЕНЬ! §6✦"
+    progress_bar_filled: "§a■"
+    progress_bar_empty: "§7■"
+    progress_bar_bracket: "§7["
+
+  # ─── Ежедневный бонус (при входе) ────────────
+  daily_bonus:
+    available:
+      - ""
+      - "§6☀ §eЕжедневный бонус доступен! §7(/cubixsmp daily)"
+      - "§7Получи §a{amount} XP"
+      - ""
+
+  # ─── /checkonline — статистика онлайна ───────
+  checkonline:
+    header: "§6╔═══════════════════════════════╗"
+    title: "§6║ §lOnline: §e{player}"
+    footer: "§6╚═══════════════════════════════╝"
+    entry: "§e{date} §7=> §f{time}"
+    weekly_total: "§6За неделю: §e{total}"
+
+  # ─── @пнг в чате ────────────────────────────
+  ping:
+    toggled_on: "§a✔ Звук пинга §a§lВКЛЮЧЁН"
+    toggled_off: "§c✔ Звук пинга §c§lВЫКЛЮЧЕН"
+    no_permission: "§c❌ У вас нет прав использовать @{type}!"
+
+  # ─── Ошибки и отладка ────────────────────────
+  errors:
+    java_not_found: "§c❌ Java не найдена. Установите Java 21+"
+    config_load: "§c❌ Ошибка загрузки конфигурации: {error}"
+    data_save: "§c⚠ Ошибка сохранения данных игрока: {error}"
+    papi_not_found: "§ePlaceholderAPI не найден — плейсхолдеры отключены"

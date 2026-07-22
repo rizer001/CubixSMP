@@ -1,4 +1,4 @@
-package com.cubixlevels;
+package com.cubixsmp;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;

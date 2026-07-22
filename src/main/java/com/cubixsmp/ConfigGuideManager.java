@@ -1,4 +1,4 @@
-package com.cubixlevels;
+package com.cubixsmp;
 
 import java.io.File;
 import java.io.InputStream;
@@ -24,7 +24,7 @@ public class ConfigGuideManager {
      * Инициализирует plugin-guide.txt: сохраняет из ресурсов (если нет),
      * проверяет хеш, перезаписывает при несовпадении.
      */
-    public static void init(CubixLevels plugin) {
+    public static void init(CubixSMP plugin) {
         File guideFile = new File(plugin.getDataFolder(), GUIDE_FILE);
 
         // При первом запуске — просто сохраняем
@@ -52,7 +52,7 @@ public class ConfigGuideManager {
     /**
      * Сохраняет plugin-guide.txt из ресурсов JAR в папку плагина.
      */
-    private static void saveGuideFromResources(CubixLevels plugin) {
+    private static void saveGuideFromResources(CubixSMP plugin) {
         try (InputStream in = plugin.getResource(GUIDE_FILE)) {
             if (in == null) {
                 plugin.getLogger().warning("[Guide] Resource not found: " + GUIDE_FILE);
@@ -87,7 +87,7 @@ public class ConfigGuideManager {
     /**
      * Сохраняет хеш гайда в файл-метку.
      */
-    private static void saveHash(CubixLevels plugin, String hash) {
+    private static void saveHash(CubixSMP plugin, String hash) {
         if (hash == null) return;
         try {
             File hashFile = new File(plugin.getDataFolder(), HASH_META_FILE);
@@ -100,7 +100,7 @@ public class ConfigGuideManager {
     /**
      * Загружает сохранённый хеш из файла-метки.
      */
-    private static String loadHash(CubixLevels plugin) {
+    private static String loadHash(CubixSMP plugin) {
         try {
             File hashFile = new File(plugin.getDataFolder(), HASH_META_FILE);
             if (!hashFile.exists()) return null;

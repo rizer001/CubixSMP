@@ -1,7 +1,7 @@
-package com.cubixlevels.listeners;
+package com.cubixsmp.listeners;
 
-import com.cubixlevels.CubixLevels;
-import com.cubixlevels.MessagesManager;
+import com.cubixsmp.CubixSMP;
+import com.cubixsmp.MessagesManager;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,9 +11,9 @@ import org.bukkit.event.player.PlayerFishEvent;
 
 public class FishingListener implements Listener {
 
-    private final CubixLevels plugin;
+    private final CubixSMP plugin;
 
-    public FishingListener(CubixLevels plugin) {
+    public FishingListener(CubixSMP plugin) {
         this.plugin = plugin;
     }
 

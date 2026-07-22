@@ -3,8 +3,8 @@ plugins {
     id 'com.gradleup.shadow' version '8.3.6'
 }
 
-group = 'com.cubixlevels'
-version = '1.4'
+group = 'com.cubixsmp'
+version = '1.2'
 
 repositories {
     mavenCentral()
@@ -28,7 +28,7 @@ java {
 }
 
 shadowJar {
-    archiveBaseName.set('CubixLevels')
+    archiveBaseName.set('CubixSMP')
     archiveClassifier.set('')
     archiveVersion.set(project.version)
 }
@@ -60,7 +60,7 @@ tasks.register('copyJarToFolder') {
             }
         }
 
-        def jarName = "CubixLevels-${project.version}.jar"
+        def jarName = "CubixSMP-${project.version}.jar"
         def target = new File(jarDir, jarName)
         java.nio.file.Files.copy(
             source.toPath(),

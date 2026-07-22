@@ -1,4 +1,4 @@
-package com.cubixlevels;
+package com.cubixsmp;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -8,14 +8,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import static com.cubixlevels.PlayerDataManager.formatXp;
+import static com.cubixsmp.PlayerDataManager.formatXp;
 import java.util.List;
 
-public class CubixLevelCommand implements CommandExecutor {
+public class CubixSMPCommand implements CommandExecutor {
 
-    private final CubixLevels plugin;
+    private final CubixSMP plugin;
 
-    public CubixLevelCommand(CubixLevels plugin) {
+    public CubixSMPCommand(CubixSMP plugin) {
         this.plugin = plugin;
     }
 
@@ -39,6 +39,7 @@ public class CubixLevelCommand implements CommandExecutor {
             case "admin" -> handleAdmin(sender, args);
             case "sound" -> handleSound(sender);
             case "leaders" -> handleLeaders(sender);
+            case "ping" -> handlePing(sender);
             default -> handleHelp(sender);
         };
     }
@@ -46,7 +47,7 @@ public class CubixLevelCommand implements CommandExecutor {
     // ─── Обработчики команд ─────────────────────
 
     private boolean handleReload(CommandSender sender) {
-        if (!sender.hasPermission("cubixlevels.reload")) {
+        if (!sender.hasPermission("cubixsmp.reload")) {
             sender.sendMessage(MessagesManager.getString("general.no_permission", "§c❌ You don't have permission!"));
             return true;
         }
@@ -83,22 +84,22 @@ public class CubixLevelCommand implements CommandExecutor {
     }
 
     private boolean handleHelp(CommandSender sender) {
-        if (sender.hasPermission("cubixlevels.admin")) {
+        if (sender.hasPermission("cubixsmp.admin")) {
             for (String line : MessagesManager.getStringList("command.help_admin",
-                    List.of("§e/cubixlevel §7— stats", "§e/cubixlevel stats §7— stats",
-                            "§e/cubixlevel daily §7— daily bonus", "§e/cubixlevel sound §7— toggle XP sound",
-                            "§e/cubixlevel leaders §7— top players",
-                            "§e/cubixlevel reload §7— reload config",
-                            "§e/cubixlevel admin §7— admin commands"))) {
+                    List.of("§e/cubixsmp §7— stats", "§e/cubixsmp stats §7— stats",
+                            "§e/cubixsmp daily §7— daily bonus", "§e/cubixsmp sound §7— toggle XP sound",
+                            "§e/cubixsmp leaders §7— top players",
+                            "§e/cubixsmp reload §7— reload config",
+                            "§e/cubixsmp admin §7— admin commands"))) {
                 sender.sendMessage(line);
             }
         } else {
-            sender.sendMessage(MessagesManager.format("command.help_header", "§6CubixLevels §7v{version}",
+            sender.sendMessage(MessagesManager.format("command.help_header", "§6CubixSMP §7v{version}",
                     "version", plugin.getDescription().getVersion()));
             for (String line : MessagesManager.getStringList("command.help_player",
-                    List.of("§e/cubixlevel §7— stats", "§e/cubixlevel daily §7— daily bonus",
-                            "§e/cubixlevel sound §7— toggle XP sound",
-                            "§e/cubixlevel leaders §7— top players"))) {
+                    List.of("§e/cubixsmp §7— stats", "§e/cubixsmp daily §7— daily bonus",
+                            "§e/cubixsmp sound §7— toggle XP sound",
+                            "§e/cubixsmp leaders §7— top players"))) {
                 sender.sendMessage(line);
             }
         }
@@ -108,7 +109,7 @@ public class CubixLevelCommand implements CommandExecutor {
     // ─── Админ-команды ─────────────────────────
 
     private boolean handleAdmin(CommandSender sender, String[] args) {
-        if (!sender.hasPermission("cubixlevels.admin")) {
+        if (!sender.hasPermission("cubixsmp.admin")) {
             sender.sendMessage(MessagesManager.getString("admin.no_permission", "§c❌ You don't have admin permission!"));
             return true;
         }
@@ -134,26 +135,25 @@ public class CubixLevelCommand implements CommandExecutor {
 
     private void showAdminHelp(CommandSender sender) {
         sender.sendMessage(MessagesManager.getString("admin.help_header", "§6╔═══════════════════════════════╗"));
-        sender.sendMessage(MessagesManager.getString("admin.help_title", "§6║ §lCubixLevels Admin §r§6       ║"));
+        sender.sendMessage(MessagesManager.getString("admin.help_title", "§6║ §lCubixSMP Admin §r§6       ║"));
         sender.sendMessage(MessagesManager.getString("admin.help_footer", "§6╚═══════════════════════════════╝"));
-        for (String line : MessagesManager.getStringList("admin.help_commands",
-                List.of("§e/cl admin info <player>", "§e/cl admin setlevel <player> <level>",
-                        "§e/cl admin addxp <player> <amount>", "§e/cl admin removexp <player> <amount>",
-                        "§e/cl admin reset <player>"))) {
+        for (String line : MessagesManager.getStringList("admin.help_commands",List.of("§e/cs admin info <player>", "§e/cs admin setlevel <player> <level>",
+                            "§e/cs admin addxp <player> <amount>", "§e/cs admin removexp <player> <amount>",
+                            "§e/cs admin reset <player>"))) {
             sender.sendMessage(line);
         }
     }
 
     /**
-     * /cubixlevel admin setlevel <player> <level>
+     * /cubixsmp admin setlevel <player> <level>
      */
     private boolean handleSetLevel(CommandSender sender, String[] args) {
-        if (!sender.hasPermission("cubixlevels.admin.setlevel") && !sender.hasPermission("cubixlevels.admin")) {
+        if (!sender.hasPermission("cubixsmp.admin.setlevel") && !sender.hasPermission("cubixsmp.admin")) {
             sender.sendMessage(MessagesManager.getString("general.no_permission", "§c❌ No permission!"));
             return true;
         }
         if (args.length < 4) {
-            sender.sendMessage(MessagesManager.getString("admin.setlevel_usage", "§c❌ Usage: /cubixlevel admin setlevel <player> <level>"));
+            sender.sendMessage(MessagesManager.getString("admin.setlevel_usage", "§c❌ Usage: /cubixsmp admin setlevel <player> <level>"));
             return true;
         }
 
@@ -190,15 +190,15 @@ public class CubixLevelCommand implements CommandExecutor {
     }
 
     /**
-     * /cubixlevel admin addxp <player> <amount>
+     * /cubixsmp admin addxp <player> <amount>
      */
     private boolean handleAddXp(CommandSender sender, String[] args) {
-        if (!sender.hasPermission("cubixlevels.admin.addxp") && !sender.hasPermission("cubixlevels.admin")) {
+        if (!sender.hasPermission("cubixsmp.admin.addxp") && !sender.hasPermission("cubixsmp.admin")) {
             sender.sendMessage(MessagesManager.getString("general.no_permission", "§c❌ No permission!"));
             return true;
         }
         if (args.length < 4) {
-            sender.sendMessage(MessagesManager.getString("admin.addxp_usage", "§c❌ Usage: /cubixlevel admin addxp <player> <amount>"));
+            sender.sendMessage(MessagesManager.getString("admin.addxp_usage", "§c❌ Usage: /cubixsmp admin addxp <player> <amount>"));
             return true;
         }
 
@@ -232,15 +232,15 @@ public class CubixLevelCommand implements CommandExecutor {
     }
 
     /**
-     * /cubixlevel admin removexp <player> <amount>
+     * /cubixsmp admin removexp <player> <amount>
      */
     private boolean handleRemoveXp(CommandSender sender, String[] args) {
-        if (!sender.hasPermission("cubixlevels.admin.removexp") && !sender.hasPermission("cubixlevels.admin")) {
+        if (!sender.hasPermission("cubixsmp.admin.removexp") && !sender.hasPermission("cubixsmp.admin")) {
             sender.sendMessage(MessagesManager.getString("general.no_permission", "§c❌ No permission!"));
             return true;
         }
         if (args.length < 4) {
-            sender.sendMessage(MessagesManager.getString("admin.removexp_usage", "§c❌ Usage: /cubixlevel admin removexp <player> <amount>"));
+            sender.sendMessage(MessagesManager.getString("admin.removexp_usage", "§c❌ Usage: /cubixsmp admin removexp <player> <amount>"));
             return true;
         }
 
@@ -277,21 +277,21 @@ public class CubixLevelCommand implements CommandExecutor {
     }
 
     /**
-     * /cubixlevel admin reset <player> [confirm]
+     * /cubixsmp admin reset <player> [confirm]
      */
     private boolean handleReset(CommandSender sender, String[] args) {
-        if (!sender.hasPermission("cubixlevels.admin.reset") && !sender.hasPermission("cubixlevels.admin")) {
+        if (!sender.hasPermission("cubixsmp.admin.reset") && !sender.hasPermission("cubixsmp.admin")) {
             sender.sendMessage(MessagesManager.getString("general.no_permission", "§c❌ No permission!"));
             return true;
         }
         if (args.length < 3) {
-            sender.sendMessage(MessagesManager.getString("admin.reset_usage", "§c❌ Usage: /cubixlevel admin reset <player>"));
+            sender.sendMessage(MessagesManager.getString("admin.reset_usage", "§c❌ Usage: /cubixsmp admin reset <player>"));
             return true;
         }
 
         // Требуется подтверждение
         if (args.length < 4 || !args[3].equalsIgnoreCase("confirm")) {
-            sender.sendMessage(MessagesManager.format("admin.reset_confirm", "§c⚠ Are you sure? Use §e/cubixlevel admin reset {target} confirm",
+            sender.sendMessage(MessagesManager.format("admin.reset_confirm", "§c⚠ Are you sure? Use §e/cubixsmp admin reset {target} confirm",
                     "target", args[2]));
             return true;
         }
@@ -320,21 +320,21 @@ public class CubixLevelCommand implements CommandExecutor {
         sender.sendMessage(MessagesManager.format("admin.reset_success", "§a✔ Player §e{target} §areset!",
                 "target", targetName));
         if (target != null && target.isOnline()) {
-            target.sendMessage(MessagesManager.getString("admin.reset_notified", "§c✦ Your CubixLevel progress has been reset by admin!"));
+            target.sendMessage(MessagesManager.getString("admin.reset_notified", "§c✦ Your CubixSMP progress has been reset by admin!"));
         }
         return true;
     }
 
     /**
-     * /cubixlevel admin info <player>
+     * /cubixsmp admin info <player>
      */
     private boolean handleInfo(CommandSender sender, String[] args) {
-        if (!sender.hasPermission("cubixlevels.admin.info") && !sender.hasPermission("cubixlevels.admin")) {
+        if (!sender.hasPermission("cubixsmp.admin.info") && !sender.hasPermission("cubixsmp.admin")) {
             sender.sendMessage(MessagesManager.getString("general.no_permission", "§c❌ No permission!"));
             return true;
         }
         if (args.length < 3) {
-            sender.sendMessage(MessagesManager.getString("admin.info_usage", "§c❌ Usage: /cubixlevel admin info <player>"));
+            sender.sendMessage(MessagesManager.getString("admin.info_usage", "§c❌ Usage: /cubixsmp admin info <player>"));
             return true;
         }
 
@@ -385,6 +385,22 @@ public class CubixLevelCommand implements CommandExecutor {
         return true;
     }
 
+    // ─── Ping toggle ────────────────────────────
+
+    private boolean handlePing(CommandSender sender) {
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(MessagesManager.getString("general.player_only", "§c❌ Only players can use this command!"));
+            return true;
+        }
+        boolean newState = plugin.getPingSettings().toggle(player);
+        if (newState) {
+            player.sendMessage(MessagesManager.getString("ping.toggled_on", "§a✔ Звук пинга §a§lВКЛЮЧЁН"));
+        } else {
+            player.sendMessage(MessagesManager.getString("ping.toggled_off", "§c✔ Звук пинга §c§lВЫКЛЮЧЕН"));
+        }
+        return true;
+    }
+
     // ─── Leaders (топ игроков) ───────────────────
 
     private boolean handleLeaders(CommandSender sender) {
@@ -425,7 +441,7 @@ public class CubixLevelCommand implements CommandExecutor {
         int maxLevel = plugin.getLevelManager().getMaxLevel();
 
         player.sendMessage(MessagesManager.getString("stats.header", "§6╔══════════════════════════════╗"));
-        player.sendMessage(MessagesManager.getString("stats.title", "§6║ §lCubixLevels §r§6— Your progress ║"));
+        player.sendMessage(MessagesManager.getString("stats.title", "§6║ §lCubixSMP §r§6— Your progress ║"));
         player.sendMessage(MessagesManager.getString("stats.footer", "§6╚══════════════════════════════╝"));
         player.sendMessage(MessagesManager.format("stats.level", "§e✦ Level: §f{level} §7/ {max}",
                 "level", String.valueOf(level), "max", String.valueOf(maxLevel)));

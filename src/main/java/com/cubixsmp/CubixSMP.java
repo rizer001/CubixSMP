@@ -1,18 +1,20 @@
-package com.cubixlevels;
+package com.cubixsmp;
 
-import com.cubixlevels.listeners.*;
+import com.cubixsmp.listeners.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 
-public final class CubixLevels extends JavaPlugin {
+public final class CubixSMP extends JavaPlugin {
 
-    private static CubixLevels instance;
+    private static CubixSMP instance;
     private LevelManager levelManager;
     private PlayerDataManager playerDataManager;
     private NaturalCheck naturalCheck;
     private PlacedBlockTracker placedBlockTracker;
-    private CubixPlaceholderExpansion placeholderExpansion;
+    private CubixSMPPlaceholderExpansion placeholderExpansion;
+    private PlaytimeTracker playtimeTracker;
+    private PingSettingsManager pingSettings;
     private boolean hasPlaceholderAPI;
 
     @Override
@@ -45,14 +47,35 @@ public final class CubixLevels extends JavaPlugin {
         // Трекер поставленных блоков (для проверки натуральности)
         getServer().getPluginManager().registerEvents(placedBlockTracker, this);
 
-        // Register command + tab completer
-        getCommand("cubixlevel").setExecutor(new CubixLevelCommand(this));
-        getCommand("cubixlevel").setTabCompleter(new CubixLevelTabCompleter());
+        // 🪓 Топор не ломается о листву (настраивается в config.yml)
+        getServer().getPluginManager().registerEvents(new LeafDurabilityListener(this), this);
+
+        // 🚫 Отключение вытаптывания грядок (настраивается в config.yml)
+        getServer().getPluginManager().registerEvents(new FarmlandTrampleListener(this), this);
+
+        // 📢 PingSettings — настройки звука пинга
+        this.pingSettings = new PingSettingsManager(this);
+
+        // 📊 PlaytimeTracker — ежедневный онлайн игроков
+        this.playtimeTracker = new PlaytimeTracker(this);
+        getServer().getPluginManager().registerEvents(playtimeTracker, this);
+        playtimeTracker.init();
+
+        // 📢 ChatMentionListener — @пнг в чате
+        getServer().getPluginManager().registerEvents(new ChatMentionListener(this, pingSettings), this);
+
+        // 🔄 ChatPlaceholderListener — пер-плеерные плейсхолдеры в чате
+        getServer().getPluginManager().registerEvents(new ChatPlaceholderListener(this), this);
+
+        // Register commands + tab completers
+        getCommand("cubixsmp").setExecutor(new CubixSMPCommand(this));
+        getCommand("cubixsmp").setTabCompleter(new CubixSMPTabCompleter());
+        getCommand("checkonline").setExecutor((sender, command, label, args) -> playtimeTracker.handleCheckOnline(sender, args));
 
         // PlaceholderAPI hook
         this.hasPlaceholderAPI = getServer().getPluginManager().getPlugin("PlaceholderAPI") != null;
         if (hasPlaceholderAPI) {
-            this.placeholderExpansion = new CubixPlaceholderExpansion(this);
+            this.placeholderExpansion = new CubixSMPPlaceholderExpansion(this);
             if (placeholderExpansion.register()) {
                 getLogger().info("PlaceholderAPI expansion registered successfully");
             } else {
@@ -69,18 +92,21 @@ public final class CubixLevels extends JavaPlugin {
         // Start playtime tracker
         getServer().getScheduler().runTaskTimer(this, this::tickPlaytime, 1200L, 1200L); // every 60s
 
-        getLogger().info("CubixLevels v" + getDescription().getVersion() + " enabled!");
+        getLogger().info("CubixSMP v" + getDescription().getVersion() + " enabled!");
     }
 
     @Override
     public void onDisable() {
+        if (playtimeTracker != null) {
+            playtimeTracker.shutdown();
+        }
         if (playerDataManager != null) {
             playerDataManager.saveAll();
         }
         if (placeholderExpansion != null) {
             placeholderExpansion.unregister();
         }
-        getLogger().info("CubixLevels disabled!");
+        getLogger().info("CubixSMP disabled!");
     }
 
     private void tickPlaytime() {
@@ -92,16 +118,18 @@ public final class CubixLevels extends JavaPlugin {
     }
 
     // --- Static access ---
-    public static CubixLevels getInstance() { return instance; }
+    public static CubixSMP getInstance() { return instance; }
     public LevelManager getLevelManager() { return levelManager; }
     public PlayerDataManager getPlayerDataManager() { return playerDataManager; }
     public NaturalCheck getNaturalCheck() { return naturalCheck; }
     public PlacedBlockTracker getPlacedBlockTracker() { return placedBlockTracker; }
+    public PingSettingsManager getPingSettings() { return pingSettings; }
+    public CubixSMPPlaceholderExpansion getPlaceholderExpansion() { return placeholderExpansion; }
     public boolean hasPlaceholderAPI() { return hasPlaceholderAPI; }
 
     public void setLastAction(java.util.UUID uuid, String action) {
         if (hasPlaceholderAPI) {
-            CubixPlaceholderExpansion.setLastAction(uuid, action);
+            CubixSMPPlaceholderExpansion.setLastAction(uuid, action);
         }
     }
 

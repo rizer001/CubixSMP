@@ -1,7 +1,7 @@
-package com.cubixlevels.listeners;
+package com.cubixsmp.listeners;
 
-import com.cubixlevels.CubixLevels;
-import com.cubixlevels.MessagesManager;
+import com.cubixsmp.CubixSMP;
+import com.cubixsmp.MessagesManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -12,9 +12,9 @@ import org.bukkit.event.block.BlockBreakEvent;
 
 public class MiningListener implements Listener {
 
-    private final CubixLevels plugin;
+    private final CubixSMP plugin;
 
-    public MiningListener(CubixLevels plugin) {
+    public MiningListener(CubixSMP plugin) {
         this.plugin = plugin;
     }
 

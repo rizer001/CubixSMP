@@ -1,6 +1,6 @@
-name: CubixLevels
+name: CubixSMP
 version: '1.0.0'
-main: com.cubixlevels.CubixLevels
+main: com.cubixsmp.CubixSMP
 api-version: '1.21'
 description: Level system for Cubix server
 author: rizer001
@@ -9,40 +9,53 @@ softdepend:
   - PlaceholderAPI
 
 commands:
-  cubixlevel:
-    description: Main CubixLevel command
-    aliases: [cl, level]
-    permission: cubixlevels.user
+  cubixsmp:
+    description: Main CubixSMP command
+    aliases: [cs, cubix, csmp]
+    permission: cubixsmp.user
+
+  checkonline:
+    description: "Просмотр ежедневного онлайна игрока"
+    aliases: [online, playtime]
+    permission: cubixsmp.checkonline
 
 permissions:
-  cubixlevels.user:
+  cubixsmp.user:
     default: true
-    description: "Базовые команды: /cubixlevel, /cubixlevel daily, /cubixlevel stats"
+    description: "Базовые команды: /cubixsmp, /cubixsmp daily, /cubixsmp stats"
 
-  cubixlevels.reload:
+  cubixsmp.checkonline:
+    default: true
+    description: "Просмотр своего онлайна (/checkonline)"
+
+  cubixsmp.checkonline.other:
     default: op
-    description: "Перезагрузка конфига (/cubixlevel reload)"
+    description: "Просмотр онлайна других игроков (/checkonline <ник>)"
 
-  cubixlevels.admin:
+  cubixsmp.reload:
+    default: op
+    description: "Перезагрузка конфига (/cubixsmp reload)"
+
+  cubixsmp.admin:
     default: op
     description: "Доступ ко всем админ-командам"
 
-  cubixlevels.admin.setlevel:
+  cubixsmp.admin.setlevel:
     default: op
-    description: "Установить уровень игроку (/cubixlevel admin setlevel <player> <level>)"
+    description: "Установить уровень игроку (/cubixsmp admin setlevel <player> <level>)"
 
-  cubixlevels.admin.addxp:
+  cubixsmp.admin.addxp:
     default: op
-    description: "Добавить XP игроку (/cubixlevel admin addxp <player> <amount>)"
+    description: "Добавить XP игроку (/cubixsmp admin addxp <player> <amount>)"
 
-  cubixlevels.admin.removexp:
+  cubixsmp.admin.removexp:
     default: op
-    description: "Забрать XP у игрока (/cubixlevel admin removexp <player> <amount>)"
+    description: "Забрать XP у игрока (/cubixsmp admin removexp <player> <amount>)"
 
-  cubixlevels.admin.reset:
+  cubixsmp.admin.reset:
     default: op
-    description: "Сбросить прогресс игрока (/cubixlevel admin reset <player>)"
+    description: "Сбросить прогресс игрока (/cubixsmp admin reset <player>)"
 
-  cubixlevels.admin.info:
+  cubixsmp.admin.info:
     default: op
-    description: "Показать информацию о игроке (/cubixlevel admin info <player>)"
+    description: "Показать информацию о игроке (/cubixsmp admin info <player>)"

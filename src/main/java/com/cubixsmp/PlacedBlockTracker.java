@@ -1,4 +1,4 @@
-package com.cubixlevels;
+package com.cubixsmp;
 
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -33,10 +33,10 @@ import java.util.Set;
  */
 public class PlacedBlockTracker implements Listener {
 
-    private final CubixLevels plugin;
+    private final CubixSMP plugin;
     private final NamespacedKey key;
 
-    public PlacedBlockTracker(CubixLevels plugin) {
+    public PlacedBlockTracker(CubixSMP plugin) {
         this.plugin = plugin;
         this.key = new NamespacedKey(plugin, "placed_blocks");
     }

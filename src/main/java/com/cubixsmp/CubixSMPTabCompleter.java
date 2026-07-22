@@ -1,4 +1,4 @@
-package com.cubixlevels;
+package com.cubixsmp;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CubixLevelTabCompleter implements TabCompleter {
+public class CubixSMPTabCompleter implements TabCompleter {
 
     private static final List<String> PLAYER_COMMANDS = List.of("daily", "stats", "sound", "leaders");
     private static final List<String> ADMIN_COMMANDS = List.of(
@@ -33,10 +33,10 @@ public class CubixLevelTabCompleter implements TabCompleter {
             commands.add("stats");
             commands.add("sound");
             commands.add("leaders");
-            if (sender.hasPermission("cubixlevels.reload")) {
+            if (sender.hasPermission("cubixsmp.reload")) {
                 commands.add("reload");
             }
-            if (sender.hasPermission("cubixlevels.admin")) {
+            if (sender.hasPermission("cubixsmp.admin")) {
                 commands.add("admin");
             }
             return filter(commands, args[0]);
@@ -65,7 +65,7 @@ public class CubixLevelTabCompleter implements TabCompleter {
                     if (args.length == 4 && sub.equals("setlevel")) {
                         // Предлагаем уровни 1-100
                         List<String> levels = new ArrayList<>();
-                        int max = CubixLevels.getInstance().getLevelManager().getMaxLevel();
+                        int max = CubixSMP.getInstance().getLevelManager().getMaxLevel();
                         for (int i = 1; i <= max; i += 5) {
                             levels.add(String.valueOf(i));
                         }

@@ -1,7 +1,7 @@
-package com.cubixlevels.listeners;
+package com.cubixsmp.listeners;
 
-import com.cubixlevels.CubixLevels;
-import com.cubixlevels.MessagesManager;
+import com.cubixsmp.CubixSMP;
+import com.cubixsmp.MessagesManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,13 +11,13 @@ import java.util.List;
 
 /**
  * Reminds players about the daily bonus when they join.
- * The actual claiming is done via /cubixlevel daily.
+ * The actual claiming is done via /cubixsmp daily.
  */
 public class DailyBonusListener implements Listener {
 
-    private final CubixLevels plugin;
+    private final CubixSMP plugin;
 
-    public DailyBonusListener(CubixLevels plugin) {
+    public DailyBonusListener(CubixSMP plugin) {
         this.plugin = plugin;
     }
 
@@ -28,7 +28,7 @@ public class DailyBonusListener implements Listener {
             plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
                 if (player.isOnline()) {
                     List<String> lines = MessagesManager.getStringList("daily_bonus.available",
-                            List.of("", "§6☀ §eDaily bonus available! §7(/cubixlevel daily)",
+                            List.of("", "§6☀ §eDaily bonus available! §7(/cubixsmp daily)",
                                     "§7Get §a{amount} XP", ""));
                     int amount = plugin.getConfig().getInt("settings.daily-bonus-xp", 50);
                     for (String line : lines) {

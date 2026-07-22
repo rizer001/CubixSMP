@@ -1,4 +1,4 @@
-package com.cubixlevels;
+package com.cubixsmp;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public class LevelManager {
 
-    private final CubixLevels plugin;
+    private final CubixSMP plugin;
     private final Map<UUID, Double> xpCache = new HashMap<>();
     private final Map<UUID, Integer> levelCache = new HashMap<>();
 
@@ -15,7 +15,7 @@ public class LevelManager {
     private double xpMultiplier;
     private int maxLevel;
 
-    public LevelManager(CubixLevels plugin) {
+    public LevelManager(CubixSMP plugin) {
         this.plugin = plugin;
         reload();
     }

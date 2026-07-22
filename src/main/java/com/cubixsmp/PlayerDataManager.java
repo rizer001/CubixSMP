@@ -1,4 +1,4 @@
-package com.cubixlevels;
+package com.cubixsmp;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public class PlayerDataManager {
 
-    private final CubixLevels plugin;
+    private final CubixSMP plugin;
     private final Map<UUID, PlayerData> dataMap = new HashMap<>();
 
     private static class PlayerData {
@@ -38,7 +38,7 @@ public class PlayerDataManager {
         }
     }
 
-    public PlayerDataManager(CubixLevels plugin) {
+    public PlayerDataManager(CubixSMP plugin) {
         this.plugin = plugin;
         plugin.getServer().getPluginManager().registerEvents(new org.bukkit.event.Listener() {
             @org.bukkit.event.EventHandler

@@ -1,7 +1,7 @@
-package com.cubixlevels.listeners;
+package com.cubixsmp.listeners;
 
-import com.cubixlevels.CubixLevels;
-import com.cubixlevels.MessagesManager;
+import com.cubixsmp.CubixSMP;
+import com.cubixsmp.MessagesManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public class DistanceListener implements Listener {
 
-    private final CubixLevels plugin;
+    private final CubixSMP plugin;
     private final Map<UUID, Location> lastPosition = new HashMap<>();
     private final Map<UUID, Double> cumulativeDistance = new HashMap<>();
 
@@ -27,7 +27,7 @@ public class DistanceListener implements Listener {
      */
     private static final double MAX_LEGIT_MOVE = 50.0;
 
-    public DistanceListener(CubixLevels plugin) {
+    public DistanceListener(CubixSMP plugin) {
         this.plugin = plugin;
     }
 

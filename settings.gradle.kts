@@ -1,1 +1,1 @@
-rootProject.name = "CubixLevels"
+rootProject.name = "CubixSMP"

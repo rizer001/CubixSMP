@@ -1,4 +1,4 @@
-package com.cubixlevels;
+package com.cubixsmp;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
@@ -9,17 +9,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class CubixPlaceholderExpansion extends PlaceholderExpansion {
+public class CubixSMPPlaceholderExpansion extends PlaceholderExpansion {
 
-    private final CubixLevels plugin;
+    private final CubixSMP plugin;
     private static final Map<UUID, String> lastActions = new HashMap<>();
 
-    public CubixPlaceholderExpansion(CubixLevels plugin) {
+    public CubixSMPPlaceholderExpansion(CubixSMP plugin) {
         this.plugin = plugin;
     }
 
     /**
-     * Сохраняет последнее действие игрока для плейсхолдера %cubixlevel_action%.
+     * Сохраняет последнее действие игрока для плейсхолдера %cubixsmp_action%.
      */
     public static void setLastAction(UUID uuid, String action) {
         lastActions.put(uuid, action);
@@ -27,7 +27,7 @@ public class CubixPlaceholderExpansion extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getIdentifier() {
-        return "cubixlevel";
+        return "cubixsmp";
     }
 
     @Override
@@ -55,20 +55,20 @@ public class CubixPlaceholderExpansion extends PlaceholderExpansion {
         if (player == null) return "0";
 
         return switch (params.toLowerCase()) {
-            // %cubixlevel_player% — имя игрока
+            // %cubixsmp_player% — имя игрока
             case "player" -> player.getName();
 
-            // %cubixlevel_level% — текущий уровень
+            // %cubixsmp_level% — текущий уровень
             case "level" -> String.valueOf(plugin.getLevelManager().getLevel(player.getUniqueId()));
 
-            // %cubixlevel_xp% — текущий опыт
+            // %cubixsmp_xp% — текущий опыт
             case "xp" -> formatXp(plugin.getLevelManager().getXp(player.getUniqueId()));
 
-            // %cubixlevel_amount% — сколько XP нужно до следующего уровня
+            // %cubixsmp_amount% — сколько XP нужно до следующего уровня
             case "amount" -> formatXp(plugin.getLevelManager().getXpForNextLevel(
                     plugin.getLevelManager().getLevel(player.getUniqueId())));
 
-            // %cubixlevel_action% — последнее действие игрока (Mining, Farming, Hunting, Fishing, Woodcutting, Daily, Distance, Playtime)
+            // %cubixsmp_action% — последнее действие игрока (Mining, Farming, Hunting, Fishing, Woodcutting, Daily, Distance, Playtime)
             case "action" -> lastActions.getOrDefault(player.getUniqueId(), "—");
 
             // Дополнительные (от прошлой версии)

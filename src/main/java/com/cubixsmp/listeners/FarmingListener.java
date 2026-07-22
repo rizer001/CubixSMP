@@ -1,7 +1,7 @@
-package com.cubixlevels.listeners;
+package com.cubixsmp.listeners;
 
-import com.cubixlevels.CubixLevels;
-import com.cubixlevels.MessagesManager;
+import com.cubixsmp.CubixSMP;
+import com.cubixsmp.MessagesManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -16,9 +16,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 public class FarmingListener implements Listener {
 
-    private final CubixLevels plugin;
+    private final CubixSMP plugin;
 
-    public FarmingListener(CubixLevels plugin) {
+    public FarmingListener(CubixSMP plugin) {
         this.plugin = plugin;
     }
 

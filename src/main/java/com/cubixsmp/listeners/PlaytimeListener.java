@@ -1,6 +1,6 @@
-package com.cubixlevels.listeners;
+package com.cubixsmp.listeners;
 
-import com.cubixlevels.CubixLevels;
+import com.cubixsmp.CubixSMP;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -12,15 +12,15 @@ import java.util.UUID;
 
 /**
  * Tracks playtime. The actual playtime increment is handled by the
- * scheduled task in CubixLevels.tickPlaytime() every 60 seconds.
+ * scheduled task in CubixSMP.tickPlaytime() every 60 seconds.
  * This listener only captures join/quit to sync data loading.
  */
 public class PlaytimeListener implements Listener {
 
-    private final CubixLevels plugin;
+    private final CubixSMP plugin;
     private final Map<UUID, Long> joinTimes = new HashMap<>();
 
-    public PlaytimeListener(CubixLevels plugin) {
+    public PlaytimeListener(CubixSMP plugin) {
         this.plugin = plugin;
     }
 
